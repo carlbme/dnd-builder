@@ -29,6 +29,12 @@ const { t } = useI18n()
       <p>{{ t('credits.intro') }}</p>
 
       <div class="bsc-card border border-stone-700 rounded-lg">
+        <h3 class="font-gothic text-amber-400 mb-2">{{ t('credits.softwareTitle') }}</h3>
+        <p class="text-sm text-stone-300 mb-2">{{ t('credits.softwareNotice') }}</p>
+        <a href="https://github.com/carlbme/dnd-builder/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" class="text-sm text-amber-400 hover:text-amber-300">{{ t('credits.softwareLicense') }}</a>
+      </div>
+
+      <div class="bsc-card border border-stone-700 rounded-lg">
         <h3 class="font-gothic text-amber-400 mb-2">{{ t('credits.srd51Title') }}</h3>
         <!-- lang="it": la dichiarazione resta italiana anche a interfaccia
              inglese, e un lettore di schermo deve pronunciarla come tale. -->

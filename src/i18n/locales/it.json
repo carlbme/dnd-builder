@@ -332,12 +332,17 @@
     "brainstorm": "Brainstorm Club",
     "brainstormTitle": "L'associazione ludica faentina dietro questo progetto",
     "privacy": "Privacy Policy",
-    "credits": "Crediti",
+    "credits": "Crediti e licenze",
     "license": "Licenza MIT",
     "wsg": "Web Sustainability",
     "wsgTitle": "Questo sito segue le W3C Web Sustainability Guidelines",
     "sci": "SCI Report",
-    "sciTitle": "Report sull'intensità di carbonio del software"
+    "sciTitle": "Report sull'intensità di carbonio del software",
+    "forkName": "Blocker Bunch D&D Builder",
+    "basedOn": "Basato su",
+    "upstreamName": "Character Builder di Brainstorm Club",
+    "source": "Codice sorgente",
+    "originalProject": "Progetto originale"
   },
   "sci": {
     "title": "SCI Report",
@@ -379,7 +384,10 @@
     "missing": "Blade Ward e Hex non stanno nell'SRD 5.1 ma nel Player's Handbook: l'app ne mostra il nome italiano e la descrizione sintetica inglese, senza testo integrale. Gli incantesimi di Brancalonia e Apocalisse sono materiale di Acheron Games e hanno la loro descrizione nei rispettivi dati.",
     "moreTitle": "Tutte le fonti",
     "more": "L'elenco completo di ciò che l'app spedisce e da dove viene sta in DATA-SOURCES.md, nel repository.",
-    "moreLink": "Vedi DATA-SOURCES.md"
+    "moreLink": "Vedi DATA-SOURCES.md",
+    "softwareTitle": "Software e progetto originale",
+    "softwareNotice": "Questo fork è basato su D&D Character Builder di Brainstorm Club / fullo. Il codice originale è distribuito con licenza MIT.",
+    "softwareLicense": "Licenza MIT e nota di copyright"
   },
   "privacy": {
     "title": "Privacy Policy",

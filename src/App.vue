@@ -39,46 +39,20 @@ function acceptGdpr() {
     </main>
     <footer class="border-t border-stone-800 py-6 text-center" role="contentinfo">
       <div class="container mx-auto px-4 flex flex-col items-center gap-3">
-        <!--
-          .bsc-btn del design system al posto della solita stringa di utility.
-          Restano solo le classi che il DS non può indovinare: il colore (l'app
-          usa l'oro come azione principale, il DS il rosso mattone — la scelta
-          del marchio non si cambia qui) e no-underline, perché è un <a>.
-          --sm porta la misura del piede di pagina, px-4 tiene la larghezza di
-          prima invece dei 12px del modificatore.
-        -->
-        <a
-          href="https://paypal.me/fullo/2"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="bsc-btn bsc-btn--sm px-4 py-2 bg-amber-600 hover:bg-amber-500 border-amber-600 hover:border-amber-500 text-stone-900 no-underline"
-          aria-label="Buy me a coffee (opens PayPal)"
-        >
-          <span aria-hidden="true">☕</span> Buy me a coffee
-        </a>
-        <nav class="flex flex-wrap items-center justify-center gap-3 text-xs text-stone-500" aria-label="Footer links">
-          <a
-            href="https://www.brainstormclub.it/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="font-gothic text-red-500 hover:text-red-400 transition-colors no-underline"
-            :title="t('footer.brainstormTitle')"
-          >{{ t('footer.brainstorm') }}</a>
+        <p class="font-gothic font-semibold text-stone-200">{{ t('footer.forkName') }}</p>
+        <p class="text-sm text-stone-300">
+          {{ t('footer.basedOn') }}
+          <a href="https://www.brainstormclub.it/" target="_blank" rel="noopener noreferrer" class="underline hover:text-amber-400">{{ t('footer.upstreamName') }}</a>
+        </p>
+        <nav class="flex flex-wrap items-center justify-center gap-3 text-xs text-stone-300" aria-label="Footer links">
+          <a href="https://github.com/carlbme/dnd-builder" target="_blank" rel="noopener noreferrer" class="hover:text-amber-400">{{ t('footer.source') }}</a>
           <span aria-hidden="true">·</span>
-          <span>🇪🇺 {{ t('footer.madeInEU') }}</span>
+          <a href="https://github.com/Brainstorm-Club/dnd-character-builder" target="_blank" rel="noopener noreferrer" class="hover:text-amber-400">{{ t('footer.originalProject') }}</a>
           <span aria-hidden="true">·</span>
-          <router-link to="/privacy" class="hover:text-amber-400 transition-colors">{{ t('footer.privacy') }}</router-link>
+          <!-- Keep game-data attribution reachable from every page. -->
+          <router-link to="/credits" class="hover:text-amber-400">{{ t('footer.credits') }}</router-link>
           <span aria-hidden="true">·</span>
-          <!-- CC-BY-4.0 sul testo italiano degli incantesimi: l'attribuzione
-               deve essere raggiungibile da ogni pagina, non solo dal riquadro
-               che mostra il testo. -->
-          <router-link to="/credits" class="hover:text-amber-400 transition-colors">{{ t('footer.credits') }}</router-link>
-          <span aria-hidden="true">·</span>
-          <a href="https://github.com/Brainstorm-Club/dnd-character-builder" target="_blank" rel="noopener noreferrer" class="hover:text-amber-400 transition-colors">{{ t('footer.license') }}</a>
-          <span aria-hidden="true">·</span>
-          <a href="https://www.w3.org/TR/web-sustainability-guidelines/" target="_blank" rel="noopener noreferrer" class="hover:text-amber-400 transition-colors" :title="t('footer.wsgTitle')">{{ t('footer.wsg') }}</a>
-          <span aria-hidden="true">·</span>
-          <router-link to="/sci-report" class="hover:text-emerald-400 transition-colors" :title="t('footer.sciTitle')">{{ t('footer.sci') }}</router-link>
+          <router-link to="/privacy" class="hover:text-amber-400">{{ t('footer.privacy') }}</router-link>
         </nav>
       </div>
     </footer>

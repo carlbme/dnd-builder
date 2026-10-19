@@ -4,10 +4,11 @@ import { createI18n } from 'vue-i18n'
 import { setActivePinia, createPinia } from 'pinia'
 import { h } from 'vue'
 import App from './App.vue'
+import en from './i18n/locales/en.json'
 
 const i18n = createI18n({
   legacy: false, locale: 'en', fallbackLocale: 'en',
-  messages: { en: { gdpr: { label: 'Cookies', banner: 'No cookies here', accept: 'OK' } } },
+  messages: { en: { ...en, gdpr: { label: 'Cookies', banner: 'No cookies here', accept: 'OK' } } },
   missingWarn: false, fallbackWarn: false,
 })
 
@@ -53,13 +54,16 @@ describe('cornice dell\'app', () => {
     stubLocalStorage()
   })
 
-  it('usa .bsc-btn sul pulsante del caffè conservando l\'oro dell\'app', async () => {
+  it('identifies the fork and preserves upstream attribution without donation or EU branding', async () => {
     const wrapper = await mountApp()
-    const coffee = wrapper.find('a[href="https://paypal.me/fullo/2"]')
-    expect(coffee.classes()).toContain('bsc-btn')
-    expect(coffee.classes()).toContain('bsc-btn--sm')
-    expect(coffee.classes()).toContain('bg-amber-600')
-    expect(coffee.attributes('aria-label')).toBe('Buy me a coffee (opens PayPal)')
+    const footer = wrapper.find('footer')
+    expect(footer.text()).toContain('Blocker Bunch D&D Builder')
+    expect(footer.text()).toContain('Based on')
+    expect(footer.find('a[href="https://www.brainstormclub.it/"]').text()).toBe('Brainstorm Club’s Character Builder')
+    expect(footer.find('a[href="https://github.com/carlbme/dnd-builder"]').text()).toBe('Source')
+    expect(footer.find('a[href="https://github.com/Brainstorm-Club/dnd-character-builder"]').text()).toBe('Original project')
+    expect(footer.find('a[href*="paypal"]').exists()).toBe(false)
+    expect(footer.text()).not.toContain('Proudly made in EU')
   })
 
   it('usa .bsc-btn sull\'accettazione dei cookie senza toccare ruolo ed etichetta', async () => {

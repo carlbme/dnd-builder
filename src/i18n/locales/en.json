@@ -332,12 +332,17 @@
     "brainstorm": "Brainstorm Club",
     "brainstormTitle": "The Faenza tabletop gaming association behind this project",
     "privacy": "Privacy Policy",
-    "credits": "Credits",
+    "credits": "Credits & licenses",
     "license": "MIT License",
     "wsg": "Web Sustainability",
     "wsgTitle": "This site follows W3C Web Sustainability Guidelines",
     "sci": "SCI Report",
-    "sciTitle": "Software Carbon Intensity report"
+    "sciTitle": "Software Carbon Intensity report",
+    "forkName": "Blocker Bunch D&D Builder",
+    "basedOn": "Based on",
+    "upstreamName": "Brainstorm Club’s Character Builder",
+    "source": "Source",
+    "originalProject": "Original project"
   },
   "sci": {
     "title": "SCI Report",
@@ -379,7 +384,10 @@
     "missing": "Blade Ward and Hex are in the Player's Handbook, not in SRD 5.1: the app shows their name and the short English description, with no full text. Brancalonia and Apocalisse spells are Acheron Games material and carry their own description in their data.",
     "moreTitle": "All sources",
     "more": "The full list of what the app ships and where it comes from is in DATA-SOURCES.md, in the repository.",
-    "moreLink": "See DATA-SOURCES.md"
+    "moreLink": "See DATA-SOURCES.md",
+    "softwareTitle": "Software & original project",
+    "softwareNotice": "This fork is based on D&D Character Builder by Brainstorm Club / fullo. The original code is distributed under the MIT License.",
+    "softwareLicense": "MIT license and copyright notice"
   },
   "privacy": {
     "title": "Privacy Policy",
