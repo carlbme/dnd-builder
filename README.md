@@ -1,155 +1,146 @@
-# Blocker household D&D Builder fork
+# Blocker Bunch D&D Builder
 
-Private character libraries, one-second server autosave, and view-only sharing
-with specific registered accounts. Public source: https://github.com/carlbme/dnd-builder.
-This fork preserves Brainstorm Club's Vue builder, four game variants, PDF export,
-and upstream-compatible JSON. Python FastAPI and SQLite provide account storage.
-See [OPERATIONS.md](OPERATIONS.md) for setup, privacy behavior, backups,
-password recovery, deployment and rollback. The upstream documentation below
-contains descriptions of its original client-only hosting model.
+A D&D character builder with private accounts, server autosave, and view-only
+sharing with your DM or other registered players.
 
----
+**[Open the application](https://dnd.blockerbunch.com)** ·
+[Changelog](CHANGELOG.md) · [Operations guide](OPERATIONS.md) ·
+[Original project](https://github.com/Brainstorm-Club/dnd-character-builder)
 
-# D&D Character Builder
-
-A free, open-source character builder for **D&D 5th Edition**, **Brancalonia**, and **Apocalisse**. Runs entirely in your browser — no server, no account, no tracking.
-
-**[Try it live](https://brainstorm-club.github.io/dnd-character-builder/)**
+This is a fork of **Brainstorm Club's D&D Character Builder**, originally
+created by fullo. It preserves the upstream Vue builder, game data, exports,
+history, and attribution, and adds a FastAPI/SQLite account service.
 
 ## Features
 
-- **4 game variants**: D&D 5e (2014), D&D 2024, Brancalonia (Spaghetti Fantasy), Apocalisse (Dark Fantasy)
-- **9-step wizard**: variant, race, class, abilities, background, equipment, spells, details, review
-- **3 ability score methods**: standard array, point buy, 4d6 drop lowest
-- **Random character generator**: one click per variant
-- **PDF export**: fills official AcroForm character sheets with editable fields
-- **JSON import/export**: save, share and load characters with full validation
-- **Offline-ready**: PWA with service worker caching
-- **Bilingual**: Italian and English (auto-detected)
-- **Accessible**: WCAG-compliant, keyboard navigation, screen reader support
-- **Sustainable**: follows [W3C Web Sustainability Guidelines](https://www.w3.org/TR/web-sustainability-guidelines/)
+- **Four game variants:** D&D 5e (2014), D&D 2024, Brancalonia, and Apocalisse.
+- **Character creation:** guided builder, random generation, and editable sheets.
+- **Private libraries:** open registration with username/password accounts.
+- **Server autosave:** saves edits after one second of inactivity, including
+  unfinished characters, with visible pending, saving, saved, and failed states.
+- **View-only sharing:** grant access to an existing username, view characters
+  in **Shared with me**, and revoke future server access.
+- **Conflict protection:** revision checks preserve unsaved work when another
+  device has saved a newer version; export the draft or reload the server copy.
+- **PDF and JSON:** retain upstream-compatible import/export and variant sheets.
+- **Recovery drafts:** account-scoped browser drafts retain edits during a
+  connection failure and retry after reconnecting.
+- **English and Italian:** translated builder and fork footer, with light and
+  dark themes and root-domain PWA assets.
 
-## Quick Start
+## Using the application
 
-### Use online
+1. Open [dnd.blockerbunch.com](https://dnd.blockerbunch.com) and register or sign in.
+   Usernames are case-insensitive and contain 3–32 letters, digits, underscores,
+   or hyphens. Passwords must contain **8–128 characters**.
+2. Choose a game variant and create, randomly generate, or import a character.
+3. Wait for **Saved on server** before relying on the server copy. Your library
+   is available after signing in from another browser or device.
+4. In the library, select **Manage sharing** and grant an existing username
+   access. Send that player the character link; they must sign in with the
+   account you selected.
+5. Use **View / Export** to read a sheet or download its PDF/JSON. Recipients
+   cannot edit, delete, or manage sharing on the owner's character.
 
-Visit **https://brainstorm-club.github.io/dnd-character-builder/** — that's it!
+Shared links and QR codes contain authenticated record links rather than
+character JSON. Revoking a grant blocks future server access; already viewed,
+exported, or downloaded copies cannot be recalled.
 
-### Run locally
+### Existing characters and connection failures
 
-```bash
-git clone https://github.com/Brainstorm-Club/dnd-character-builder.git
-cd dnd-character-builder
-npm install
-npm run dev
+Use **Import existing browser characters** in the library to create new server
+copies without deleting the original browser records. JSON imports also create
+new records. Characters stored on another website address must first be
+exported there, then imported here as JSON.
+
+Authentication, server libraries, and completed saves require connectivity.
+The service worker caches application assets; private API responses are never
+cached. If a save fails, retain the tab or export the recovery draft until the
+server confirms saving. Logout clears account recovery drafts and private
+in-memory character data from this browser.
+
+If you forget your password, ask the site operator for a single-use reset link.
+Links expire after 30 minutes. There is no email delivery service.
+
+## Run locally
+
+Requirements: Git with submodule support, Node.js **22.12 or newer**, and
+Python **3.12 or newer** with virtual-environment support.
+
+```sh
+git clone --recurse-submodules https://github.com/carlbme/dnd-builder.git
+cd dnd-builder
+npm ci
+python3 -m venv .venv
+.venv/bin/python -m pip install -r backend/requirements-dev.txt
 ```
 
-Open http://localhost:5173/dnd-character-builder/ in your browser.
+Start the backend in one terminal. It creates the development database and
+applies versioned migrations on startup:
 
-### Build for production
+```sh
+DND_DATABASE="$PWD/.work/dev.sqlite3" \
+DND_ORIGIN=http://localhost:5173 \
+.venv/bin/python -m uvicorn backend.app:app --host 127.0.0.1 --port 8000
+```
 
-```bash
+Start the frontend in another terminal:
+
+```sh
+npm run dev -- --host localhost --port 5173 --strictPort
+```
+
+Open **http://localhost:5173/**. Vite proxies `/api` to the local backend. Use
+`localhost` for browser development; production sign-in uses HTTPS because
+session cookies are Secure and HttpOnly. `DND_ORIGIN` must match the browser's
+origin exactly. `DND_DEV_BACKEND` can override Vite's default backend target
+of `http://127.0.0.1:8000`.
+
+## Build and verify
+
+```sh
 npm run build
+npm test
+.venv/bin/python -m pytest backend/tests
+npx playwright install chromium
+npx playwright test
 ```
 
-The `docs/` folder is ready to deploy on any static hosting (GitHub Pages serves it from `/docs`).
+Build before running the frontend tests: some checks inspect the generated PWA
+worker and manifest. The production frontend is written to **`dist/`**.
+Playwright starts its own local services and uses a separate test database under
+ignored `.work/`; it does not create players in the deployed library.
 
-## How to Use
+The inherited `docs/` directory is an upstream GitHub Pages snapshot. It is not
+the current fork's build output. This fork requires both its static frontend
+and backend; GitHub Pages alone cannot provide accounts or server libraries.
 
-### Create a character from scratch
+## Architecture and deployment
 
-1. Open the app and pick a game variant (D&D 5e, Brancalonia, or Apocalisse)
-2. Click **"From Scratch"** under the variant card
-3. Follow the 9-step wizard: choose race, class, generate ability scores, pick background, equipment, spells, fill in details
-4. On the review page, export as **PDF** (editable fields) or **JSON**
+| Component | Role |
+| --- | --- |
+| Vue 3, TypeScript, Pinia, Vite, Tailwind CSS | Builder, libraries, recovery drafts, and application assets |
+| FastAPI and SQLite | Users, sessions, character JSON, revisions, sharing grants, and schema migrations |
+| Argon2id and secure cookies | Password hashing and session authentication, with CSRF checks and rate limits |
+| Nginx and systemd | Static assets, same-origin API proxy, application startup, and scheduled backups |
+| Cloudflare Tunnel | Public HTTPS connection to the deployed origin |
 
-### Generate a random character
+See [OPERATIONS.md](OPERATIONS.md) for the Proxmox deployment, configuration,
+health checks, publication gate, password-reset commands, nightly consistent
+SQLite backups, restoration, versioned releases, and rollback. The database and
+all credentials and player data remain outside Git. Upstream updates are manual.
 
-Click **"Random"** under any variant card to instantly create a fully built character. You'll land on the review page where you can tweak, save, or export.
+## Credits and licenses
 
-### Import a character from JSON
+The application retains the original **MIT license**, including
+**Copyright (c) 2025 fullo**. See [LICENSE](LICENSE).
 
-1. Click **"Import JSON"** under the variant you're importing for
-2. Select a `.json` file previously exported from this app
-3. The file is validated — if anything is wrong, you'll see specific error messages
-4. If the character belongs to a different variant, you'll be warned but it will still load
+The original builder and design system come from
+[Brainstorm Club](https://www.brainstormclub.it/). The design system is included
+as a Git submodule. This fork's source is maintained at
+[carlbme/dnd-builder](https://github.com/carlbme/dnd-builder).
 
-### Export to PDF
-
-From the review page, click **"Export PDF Sheet"**. The exported PDF uses the official character sheet with **editable AcroForm fields** — you can keep filling it in with any PDF reader (Adobe Acrobat, Foxit, etc.).
-
-### Save characters
-
-Click **"Save Character"** on the review page. Characters are stored in your browser's localStorage and appear on the home page for quick access.
-
-## Tech Stack
-
-- [Vue 3](https://vuejs.org/) (Composition API + TypeScript)
-- [Vite](https://vite.dev/) for build
-- [Pinia](https://pinia.vuejs.org/) for state management
-- [vue-i18n](https://vue-i18n.intlify.dev/) for translations
-- [TailwindCSS v4](https://tailwindcss.com/) for styling
-- [pdf-lib](https://pdf-lib.js.org/) for PDF AcroForm filling
-- [Courier Prime](https://fonts.google.com/specimen/Courier+Prime) (headings) and [Atkinson Hyperlegible](https://fonts.google.com/specimen/Atkinson+Hyperlegible) (body), self-hosted — from the [Brainstorm Club design system](https://github.com/Brainstorm-Club/design-system)
-
-## Game Variants
-
-| Variant | Races | Classes | Max Level | Source |
-|---------|-------|---------|-----------|--------|
-| **D&D 5e** | 9 races, 18 with subraces | 12 classes + subclasses | 20 | [SRD 5.1](https://dnd.wizards.com/resources/systems-reference-document) and the 2014 Player's Handbook |
-| **D&D 2024** | 9 species, 24 lineages | 12 classes + subclasses | 20 | [SRD 5.2.1](https://www.dndbeyond.com/srd) (CC-BY-4.0) |
-| **Brancalonia** | 6 races | 12 subclasses | 6 | [Acheron Games](https://www.drivethrurpg.com/en/publisher/9086/acheron-games?affiliate_id=2960765) |
-| **Apocalisse** | 1 race, 6 origins | 12 archetypes | 20 | [Acheron Games](https://www.drivethrurpg.com/en/publisher/9086/acheron-games/category/44511/apocalisse?affiliate_id=2960765) |
-
-## Project Structure
-
-```
-src/
-  components/
-    layout/          # AppHeader, StepNavigation, LanguageSwitcher
-    steps/           # Step1Variant through Step9Review
-  composables/       # usePdfExport, useGameTerms
-  data/
-    dnd5e/           # classes, races, spells, equipment, backgrounds, rules
-    brancalonia/     # classes, races, backgrounds, rules
-    apocalisse/      # classes, races, backgrounds, rules
-  i18n/locales/      # it.json, en.json
-  stores/            # app.ts (settings), character.ts (character data)
-  utils/             # calculations, diceRoller, pdfFieldMapping, randomCharacter
-  views/             # HomeView, BuilderView, CharacterListView, PrivacyView
-public/pdf/          # PDF character sheet templates
-```
-
-## Deploy to GitHub Pages
-
-This repo includes a pre-built `docs/` folder. To deploy:
-
-1. Go to your repo **Settings > Pages**
-2. Set **Source** to **Deploy from a branch**
-3. Set **Branch** to `main` and **Folder** to `/docs`
-4. Save — your site will be live at `https://<username>.github.io/dnd-character-builder/`
-
-To update the deployment, rebuild and commit:
-
-```bash
-npm run build
-git add docs/
-git commit -m "build: update docs"
-git push
-```
-
-## Privacy
-
-This app collects **zero data**. Everything runs in your browser. No cookies, no analytics, no accounts. Character data is stored only in your browser's localStorage.
-
-## License
-
-MIT
-
-## Design
-
-The interface wears the **[Brainstorm Club design system](https://github.com/Brainstorm-Club/design-system)** — the warm *carbone* / *rosso mattone* / *carta* palette and the Courier Prime + Atkinson Hyperlegible typography — applied as a theme-level brand skin over TailwindCSS. Dark ("carbone") is the default; a light ("carta") theme mirrors a printed game manual.
-
-## Credits
-
-A [Brainstorm Club](https://github.com/Brainstorm-Club) project — the tabletop gaming association of Faenza. Built with Vue 3 and Anthropic Claude. Most D&D 5e content comes from the [Systems Reference Document 5.1](https://dnd.wizards.com/resources/systems-reference-document), published by Wizards of the Coast under the Open Gaming License. Some of it does not: 13 spells (Counterspell, Eldritch Blast, Hex, Hunter's Mark and others), 12 of the 13 backgrounds, and several subraces come from the 2014 Player's Handbook, which the SRD does not cover. That material is used here for reference and is not licensed under the OGL — see [DATA-SOURCES.md](DATA-SOURCES.md). Brancalonia and Apocalisse are products of [Acheron Games](https://www.drivethrurpg.com/en/publisher/9086/acheron-games?affiliate_id=2960765).
+Game data and sheet templates have their own sources, copyright notices, and
+licensing terms. See [DATA-SOURCES.md](DATA-SOURCES.md) and the application's
+[Credits & licenses page](https://dnd.blockerbunch.com/credits), which preserves
+SRD and other game-material attribution.
