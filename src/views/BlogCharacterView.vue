@@ -234,7 +234,7 @@ onUnmounted(() => {
       '@type': 'Article',
       'name': char.name,
       'description': t(`blog.characters.${slug}.description`).slice(0, 160),
-      'url': `https://brainstorm-club.github.io/dnd-character-builder/blog/${slug}`,
+      'url': `https://dnd.blockerbunch.com/blog/${slug}`,
       'author': { '@type': 'Person', 'name': 'fullo' },
       'publisher': { '@type': 'Organization', 'name': 'D&D Character Builder' },
     })" />

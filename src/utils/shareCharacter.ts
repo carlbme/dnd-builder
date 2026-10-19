@@ -278,5 +278,5 @@ export async function decodeCharacterAny(encoded: string): Promise<Partial<Chara
 
 /** La base di ogni link condiviso, senza il payload. */
 export function baseCondivisione(): string {
-  return `${window.location.origin}/dnd-character-builder/share/`
+  return `${window.location.origin}/share/`
 }

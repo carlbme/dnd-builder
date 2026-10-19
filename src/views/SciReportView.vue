@@ -33,7 +33,7 @@ const error = ref(false)
 
 onMounted(async () => {
   try {
-    const res = await fetch(new URL('/dnd-character-builder/sci-report.json', window.location.origin).href)
+    const res = await fetch(new URL('/sci-report.json', window.location.origin).href)
     if (res.ok) {
       report.value = await res.json()
     } else {

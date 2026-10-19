@@ -1,14 +1,18 @@
 {
   "name": "D&D Character Builder",
   "short_name": "D&D Builder",
-  "description": "Create and manage your D&D 5e, Brancalonia, and Apocalisse characters. Free, open-source, no registration required.",
-  "start_url": "/dnd-character-builder/",
-  "scope": "/dnd-character-builder/",
+  "description": "D&D 5e, D&D 2024, Brancalonia and Apocalisse characters with private accounts, server autosave and view-only sharing.",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#1c1917",
   "theme_color": "#292524",
   "orientation": "any",
-  "categories": ["games", "utilities", "entertainment"],
+  "categories": [
+    "games",
+    "utilities",
+    "entertainment"
+  ],
   "icons": [
     {
       "src": "favicon.svg",
