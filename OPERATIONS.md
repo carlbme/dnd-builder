@@ -67,7 +67,7 @@ are not logged. Reset links place the secret in a URL fragment, not a query.
 ## Accounts and recovery
 
 Registration is open; usernames are case-insensitive (3–32 letters, digits,
-underscores or hyphens), with passwords of 12–128 characters. Passwords use
+underscores or hyphens), with passwords of 8–128 characters. Passwords use
 Argon2id. Host-only Secure/HttpOnly/SameSite cookies hold random session tokens;
 only token hashes are stored. Sessions last 30 days, and password changes and
 password resets invalidate the account's existing sessions. Mutations require

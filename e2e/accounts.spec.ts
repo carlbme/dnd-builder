@@ -1,5 +1,5 @@
 import { test, expect, type Page, type BrowserContext } from '@playwright/test'
-const password = 'Acceptance-only password 123!'
+const password = 'Test123!' // Exercise the eight-character minimum in real browsers.
 const suffix = Date.now().toString(36)
 const names = {alice:'alice_'+suffix, bob:'bob_'+suffix, dm:'dm_'+suffix}
 

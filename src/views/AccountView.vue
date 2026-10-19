@@ -56,8 +56,8 @@ async function logout() {
       <label v-if="cloud.user && route.path !== '/account/reset'">Current password
         <input v-model="current" required type="password" maxlength="128" autocomplete="current-password">
       </label>
-      <label>{{ cloud.user || route.path === '/account/reset' ? 'New password' : 'Password' }} (12–128 characters)
-        <input v-model="password" required type="password" minlength="12" maxlength="128" :autocomplete="cloud.user || mode === 'register' || route.path === '/account/reset' ? 'new-password' : 'current-password'">
+      <label>{{ cloud.user || route.path === '/account/reset' ? 'New password' : 'Password' }} (8–128 characters)
+        <input v-model="password" required type="password" minlength="8" maxlength="128" :autocomplete="cloud.user || mode === 'register' || route.path === '/account/reset' ? 'new-password' : 'current-password'">
       </label>
       <button :disabled="busy || !cloud.ready" type="submit">{{ busy ? 'Please wait…' : route.path === '/account/reset' ? 'Reset password' : cloud.user ? 'Change password' : mode === 'register' ? 'Create account' : 'Sign in' }}</button>
     </form>

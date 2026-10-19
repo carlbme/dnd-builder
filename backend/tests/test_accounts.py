@@ -7,7 +7,7 @@ from backend.app import app, COOKIE, digest, now
 from backend.db import connect, backup, migrate
 
 ORIGIN = 'https://dnd.blockerbunch.com'
-PASSWORD = 'A long test password 123!'
+PASSWORD = 'Test123!'
 
 
 @pytest.fixture
@@ -159,3 +159,23 @@ def test_limits_validation_and_argon2id(environment):
         # Rate buckets survive application restarts.
     with TestClient(app):
         assert c.post('/api/login', json={'username':'alice','password':PASSWORD}).status_code == 429
+
+
+def test_eight_character_password_boundary(environment):
+    with TestClient(app):
+        c = client()
+        assert c.post('/api/register', json={'username': 'eightuser', 'password': '1234567'}).status_code == 422
+        c = register('eightuser')  # Exactly eight characters.
+        login = client()
+        assert login.post('/api/login', json={'username': 'eightuser', 'password': PASSWORD}).status_code == 200
+        assert c.post('/api/password', json={'current_password': PASSWORD, 'password': '1234567'}).status_code == 422
+        changed = c.post('/api/password', json={'current_password': PASSWORD, 'password': 'Newpass8'})
+        assert changed.status_code == 200
+        c.headers['X-CSRF-Token'] = changed.json()['csrf']
+        uid = changed.json()['user']['id']
+        with connect() as db:
+            db.execute('INSERT INTO reset_links VALUES (?,?,?)', (digest('r'*40), uid, now()+600))
+        assert c.post('/api/reset-password', json={'token': 'r'*40, 'password': '1234567'}).status_code == 422
+        assert c.post('/api/reset-password', json={'token': 'r'*40, 'password': 'Reset888'}).status_code == 200
+        login = client()
+        assert login.post('/api/login', json={'username': 'eightuser', 'password': 'Reset888'}).status_code == 200

@@ -116,17 +116,17 @@ def throttle(request, action, username=''):
 
 class Credentials(BaseModel):
     username: str = Field(min_length=3, max_length=32, pattern=r'^[A-Za-z0-9_-]+$')
-    password: str = Field(min_length=12, max_length=128)
+    password: str = Field(min_length=8, max_length=128)
 
 
 class PasswordChange(BaseModel):
     current_password: str = Field(max_length=128)
-    password: str = Field(min_length=12, max_length=128)
+    password: str = Field(min_length=8, max_length=128)
 
 
 class ResetPassword(BaseModel):
     token: str = Field(min_length=32, max_length=128)
-    password: str = Field(min_length=12, max_length=128)
+    password: str = Field(min_length=8, max_length=128)
 
 
 class CharacterWrite(BaseModel):
