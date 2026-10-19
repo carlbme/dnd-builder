@@ -1,4 +1,9 @@
 {
+  "forkHosting": {
+      "date": "2026-10-19",
+      "source": "https://github.com/Brainstorm-Club/dnd-character-builder",
+      "notes": "This fork adds an always-on FastAPI/SQLite service and account session cookie. Server libraries require connectivity; PWA caching is limited to application assets. Upstream client-only/zero-server claims below describe upstream, not this deployment."
+  },
   "project": "dnd-builder",
   "date": "2026-03-10",
   "spec": "W3C Web Sustainability Guidelines 1.0",

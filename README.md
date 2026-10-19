@@ -1,3 +1,15 @@
+# Blocker household D&D Builder fork
+
+Private character libraries, one-second server autosave, and view-only sharing
+with specific registered accounts. Public source: https://github.com/carlbme/dnd-builder.
+This fork preserves Brainstorm Club's Vue builder, four game variants, PDF export,
+and upstream-compatible JSON. Python FastAPI and SQLite provide account storage.
+See [OPERATIONS.md](OPERATIONS.md) for setup, privacy behavior, backups,
+password recovery, deployment and rollback. The upstream documentation below
+contains descriptions of its original client-only hosting model.
+
+---
+
 # D&D Character Builder
 
 A free, open-source character builder for **D&D 5th Edition**, **Brancalonia**, and **Apocalisse**. Runs entirely in your browser — no server, no account, no tracking.

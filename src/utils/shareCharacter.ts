@@ -1,7 +1,7 @@
+import { useCloudStore } from '@/stores/cloud'
 /**
- * Character sharing via URL.
- * Compresses character JSON using base64 encoding into a URL hash.
- * Uses a compact format to minimize URL length.
+ * New sharing links point to authenticated server records.
+ * Legacy content codecs remain for compatibility with previously exported links.
  */
 import type { CharacterData } from '@/stores/character'
 
@@ -158,10 +158,9 @@ export function decodeCharacterFromUrl(encoded: string): Partial<CharacterData> 
 
 /** Generate a full share URL for the character */
 export function generateShareUrl(char: CharacterData): string {
-  const encoded = encodeCharacterToUrl(char)
-  // Use history-mode URL: /dnd-character-builder/share/ENCODED
-  const base = window.location.origin + '/dnd-character-builder'
-  return `${base}/share/${encoded}`
+  const draft = useCloudStore().drafts[char.id]
+  if (!draft?.serverId || draft.dirty) throw new Error('Save this character to your account before sharing.')
+  return `${window.location.origin}/character/${draft.serverId}`
 }
 
 /** Generate share URL and copy to clipboard. Returns { copied, url }. */

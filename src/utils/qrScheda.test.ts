@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest'
+import { describe, it, expect, beforeAll, vi } from 'vitest'
 import { preloadVariantData } from '@/data'
 import { generateRandomCharacter } from '@/utils/randomCharacter'
 import {
@@ -6,6 +6,9 @@ import {
   MARCATORE_COMPRESSO, sappiamoComprimere,
 } from '@/utils/shareCharacter'
 import { creaQrScheda } from '@/utils/qrScheda'
+
+const cloud = vi.hoisted(() => ({ drafts: new Proxy({}, { get: () => ({ serverId: '11111111-1111-4111-8111-111111111111', dirty: false }) }) }))
+vi.mock('@/stores/cloud', () => ({ useCloudStore: () => cloud }))
 
 const VARIANTI = ['dnd5e', 'dnd2024', 'brancalonia', 'apocalisse'] as const
 
@@ -91,7 +94,7 @@ describe('il QR della scheda', () => {
     expect(qr.versione).toBeGreaterThanOrEqual(1)
     expect(qr.versione).toBeLessThanOrEqual(40)
     expect(Number.isInteger(qr.versione)).toBe(true)
-    expect(qr.url).toContain('/share/' + MARCATORE_COMPRESSO)
+    expect(qr.url).toContain('/character/11111111-1111-4111-8111-111111111111')
     expect(qr.byte).toBeLessThanOrEqual(2953)
     expect(qr.svg.startsWith('<svg')).toBe(true)
     expect(qr.svg.endsWith('</svg>')).toBe(true)
@@ -108,15 +111,13 @@ describe('il QR della scheda', () => {
     for (let c = 8; c < lato - 8; c++) expect(scuro(6, c)).toBe(c % 2 === 0)
   })
 
-  it('l\'indirizzo nel QR si ridecodifica nel personaggio', async () => {
+  it('the QR contains only an authenticated server link, never character JSON', async () => {
     const c = generateRandomCharacter('dnd2024')
+    c.name = 'PrivateNameNotInTheLink'
     const qr = await creaQrScheda(c)
-    const payload = qr.url.slice(qr.url.indexOf('/share/') + '/share/'.length)
-    const tornato = await decodeCharacterAny(payload)
-    expect(tornato.name).toBe(c.name)
-    expect(tornato.className).toBe(c.className)
-    expect(tornato.level).toBe(c.level)
-    expect(tornato.abilityScores).toEqual(c.abilityScores)
+    expect(qr.url).not.toContain(c.name)
+    expect(qr.url).not.toContain('/share/')
+    expect(qr.url).toMatch(/\/character\/[a-f0-9-]+$/)
   })
 
   it('un personaggio normale ci sta intero, senza sacrifici', async () => {
@@ -124,23 +125,13 @@ describe('il QR della scheda', () => {
     expect(qr.ridotto).toBe(false)
   })
 
-  it('un trascorso enorme non rompe il codice: lascia indietro il racconto', async () => {
+  it('large private notes do not change the link or truncate character data', async () => {
     const c = generateRandomCharacter('dnd5e')
-    // Testo che lo sgonfiamento non puo' aiutare. La prima versione di questa
-    // prova usava una sequenza periodica: deflate la schiacciava, il QR ci
-    // stava lo stesso e la prova falliva accusando il codice invece di se'.
-    // Qui un generatore congruenziale su 64 simboli non lascia ridondanza.
-    let seme = 12345
-    c.backstory = Array.from({ length: 6000 }, () => {
-      seme = (seme * 1103515245 + 12345) & 0x7fffffff
-      return 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'[(seme >>> 16) % 64]
-    }).join('')
-    const qr = await creaQrScheda(c)
-    expect(qr.ridotto).toBe(true)
-    expect(qr.byte).toBeLessThanOrEqual(2953)
-    const payload = qr.url.slice(qr.url.indexOf('/share/') + '/share/'.length)
-    const tornato = await decodeCharacterAny(payload)
-    expect(tornato.backstory).toBeUndefined()
-    expect(tornato.name).toBe(c.name)
+    const initial = await creaQrScheda(c)
+    c.backstory = 'private notes'.repeat(10000)
+    const next = await creaQrScheda(c)
+    expect(next.url).toBe(initial.url)
+    expect(next.ridotto).toBe(false)
+    expect(c.backstory.length).toBe(130000)
   })
 })

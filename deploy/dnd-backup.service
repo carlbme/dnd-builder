@@ -1,0 +1,16 @@
+[Unit]
+Description=Consistent D&D SQLite daily backup
+After=dnd-builder.service
+
+[Service]
+Type=oneshot
+User=dnd-builder
+Group=dnd-builder
+WorkingDirectory=/opt/dnd-builder/current
+EnvironmentFile=/etc/dnd-builder/app.env
+ExecStart=/opt/dnd-builder/current/.venv/bin/python -m backend.cli backup
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/dnd-builder /var/backups/dnd-builder

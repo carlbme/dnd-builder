@@ -35,3 +35,12 @@ dev-dist/
 # Claude Code
 .claude/
 .work/
+
+# Server/private runtime data
+.venv/
+__pycache__/
+.pytest_cache/
+*.sqlite3
+*.sqlite3-*
+playwright-report/
+test-results/

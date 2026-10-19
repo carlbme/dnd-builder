@@ -1,0 +1,10 @@
+[Unit]
+Description=Nightly D&D database backup before the Proxmox backup
+
+[Timer]
+OnCalendar=*-*-* 02:30:00
+Persistent=true
+Unit=dnd-backup.service
+
+[Install]
+WantedBy=timers.target

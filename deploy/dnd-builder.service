@@ -1,0 +1,28 @@
+[Unit]
+Description=D&D Builder private accounts and characters API
+After=network.target
+
+[Service]
+Type=simple
+User=dnd-builder
+Group=dnd-builder
+WorkingDirectory=/opt/dnd-builder/current
+EnvironmentFile=/etc/dnd-builder/app.env
+ExecStart=/opt/dnd-builder/current/.venv/bin/python -m uvicorn backend.app:app --host 127.0.0.1 --port 8000 --workers 1 --no-access-log --no-proxy-headers
+Restart=on-failure
+RestartSec=3
+UMask=0077
+StateDirectory=dnd-builder
+StateDirectoryMode=0700
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/dnd-builder /var/backups/dnd-builder
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+
+[Install]
+WantedBy=multi-user.target

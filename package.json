@@ -33,6 +33,7 @@
   "devDependencies": {
     "@intlify/unplugin-vue-i18n": "^11.0.7",
     "@lhci/cli": "^0.15.1",
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/vite": "^4.2.1",
     "@types/node": "^24.10.1",
     "@vitejs/plugin-vue": "^6.0.2",

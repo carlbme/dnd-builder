@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import AccountBar from '@/components/shared/AccountBar.vue'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import { useTheme } from '@/composables/useTheme'
 
@@ -32,6 +33,7 @@ function acceptGdpr() {
       Skip to content
     </a>
     <AppHeader />
+    <AccountBar />
     <main id="main-content" class="container mx-auto px-4 py-6 flex-1" role="main">
       <router-view />
     </main>

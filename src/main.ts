@@ -7,6 +7,7 @@ import i18n, { initI18n } from './i18n'
 import { sweepStaleCache } from './data'
 import { sorvegliaAggiornamenti } from './utils/aggiornamento'
 import './style.css'
+import { useCloudStore } from './stores/cloud'
 
 // GitHub Pages SPA redirect: restore path from 404.html redirect query param
 const params = new URLSearchParams(window.location.search)
@@ -38,12 +39,14 @@ async function bootstrap() {
   await initI18n()
 
   const pinia = createPinia()
-  pinia.use(piniaPluginPersistedstate)
+  // Private characters use account-scoped recovery storage, never the legacy key.
+  pinia.use(context => { if (context.store.$id !== 'character') return piniaPluginPersistedstate(context) })
 
   const app = createApp(App)
   app.use(pinia)
   app.use(router)
   app.use(i18n)
+  await useCloudStore(pinia).init()
 
   // Navigate to restored route after mount (GitHub Pages SPA)
   if (redirectRoute) {

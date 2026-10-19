@@ -3,12 +3,12 @@ import { computed, ref, watchEffect, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { getBlogCharacterBySlug } from '@/data/blog/characters'
+import { useCloudStore } from '@/stores/cloud'
 import { useCharacterStore } from '@/stores/character'
 import { useGameTerms } from '@/composables/useGameTerms'
 import type { CharacterData } from '@/stores/character'
 import CharacterSheet from '@/components/shared/CharacterSheet.vue'
 import { usePdfExport } from '@/composables/usePdfExport'
-import { generateShareUrl } from '@/utils/shareCharacter'
 import { variantInfo } from '@/data/variants'
 
 const route = useRoute()
@@ -68,20 +68,21 @@ function downloadJson() {
   URL.revokeObjectURL(url)
 }
 
-function saveToProfile() {
+async function saveToProfile() {
   if (!char.value) return
   // Create a deep copy with a new unique ID so it doesn't clash
   const copy: CharacterData = JSON.parse(JSON.stringify(char.value))
   copy.id = crypto.randomUUID()
   characterStore.character = copy
-  characterStore.saveCharacter()
-  saveMessage.value = t('blog.savedSuccess')
+  const cloud = useCloudStore()
+  await cloud.flush()
+  saveMessage.value = cloud.status
   setTimeout(() => { saveMessage.value = '' }, 3000)
 }
 
 async function shareCharacter() {
   if (!char.value) return
-  const url = generateShareUrl(char.value)
+  const url = window.location.origin + '/blog/' + route.params.slug
   try {
     await navigator.clipboard.writeText(url)
     shareMessage.value = t('review.shareCopied')

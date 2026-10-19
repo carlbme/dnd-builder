@@ -12,7 +12,7 @@
   },
   "home": {
     "welcome": "Benvenuto nel Character Builder",
-    "description": "Crea e gestisci i tuoi personaggi per D&D 5e, D&D 2024, Brancalonia e Apocalisse. Funziona interamente nel browser, senza registrazione e senza inviare dati a nessun server.",
+    "description": "Build characters for D&D 5e, D&D 2024, Brancalonia and Apocalisse. Sign in for a private server library, autosave and view-only sharing with your DM.",
     "startButton": "Crea un Nuovo Personaggio",
     "randomButton": "Casuale",
     "randomDnd5e": "Casuale D&D 5e",
@@ -267,8 +267,8 @@
     "qrTooLarge": "Questa scheda è troppo lunga per un QR code, anche senza i testi liberi. Usa il link di condivisione.",
     "qrNoSupport": "Questo browser non sa comprimere i dati, e senza compressione la scheda non entra in un QR code. Usa il link di condivisione.",
     "qrInfo": "Versione {version} · {bytes} byte",
-    "shareCopied": "Link copiato negli appunti!",
-    "shareManual": "Copia il link qui sotto per condividere il personaggio:",
+    "shareCopied": "Character link copied. Only the owner and accounts granted access in Manage sharing can open it.",
+    "shareManual": "Copy this authenticated link. Grant access to specific usernames in your library’s Manage sharing.",
     "shareFailed": "Impossibile generare il link. Riprova.",
     "levelUp": "Sali di Livello",
     "levelDown": "Scendi di Livello",
@@ -383,13 +383,13 @@
   },
   "privacy": {
     "title": "Privacy Policy",
-    "noData": "Questa applicazione non raccoglie, memorizza o trasmette alcun dato personale a server esterni.",
-    "localStorage": "Tutti i dati dei personaggi vengono salvati esclusivamente nella memoria locale del tuo browser (localStorage). Nessun dato lascia il tuo dispositivo.",
-    "noCookies": "Non utilizziamo cookie di tracciamento, analytics o servizi di terze parti.",
-    "noAccount": "Non è richiesta alcuna registrazione. L'applicazione funziona interamente offline dopo il primo caricamento."
+    "noData": "The site stores your username, password hash, session information, character data, and sharing permissions on its server. Backups retain this data for recovery. Never put passwords or other secrets in character notes.",
+    "localStorage": "Signed-in characters are stored on this server. Unsaved recovery drafts are kept on this browser, separated by account, and cleared on logout. Shared accounts can view and export selected characters. Exported copies cannot be revoked.",
+    "noCookies": "An essential secure session cookie keeps you signed in. There are no advertising or analytics cookies. Cloudflare provides the public HTTPS connection.",
+    "noAccount": "Registration is open. An account and network connection are required to load server libraries and complete saves. The current owner’s recovery drafts remain locally during connection failures; the interface confirms when the server has saved them."
   },
   "gdpr": {
-    "banner": "Questa app funziona interamente nel tuo browser. Nessun dato viene inviato a server esterni. Utilizziamo solo un cookie tecnico per salvare la preferenza della lingua.",
+    "banner": "This site uses an essential session cookie for accounts and browser storage for preferences, app assets, and account-scoped recovery drafts. Character saves require a connection to the server.",
     "accept": "Ho capito",
     "label": "Informativa sui cookie"
   },

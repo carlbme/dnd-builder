@@ -1183,7 +1183,8 @@ export const useCharacterStore = defineStore('character', () => {
     const data: CharacterData = {
       ...empty,
       ...(safeRaw as Partial<CharacterData>),
-      id: (typeof raw.id === 'string' && raw.id.length < 100) ? raw.id : crypto.randomUUID(),
+      // Imports are new records, never updates to the source character.
+      id: crypto.randomUUID(),
       variant: raw.variant as GameVariant,
     }
 

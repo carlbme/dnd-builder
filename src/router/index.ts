@@ -1,8 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
-  history: createWebHistory('/dnd-character-builder/'),
+  history: createWebHistory('/'),
   routes: [
+    { path: '/account', component: () => import('@/views/AccountView.vue') },
+    { path: '/account/reset', component: () => import('@/views/AccountView.vue') },
+    { path: '/character/:id', component: () => import('@/views/ServerCharacterView.vue') },
     {
       path: '/',
       name: 'home',
@@ -16,7 +19,7 @@ const router = createRouter({
     {
       path: '/characters',
       name: 'characters',
-      component: () => import('@/views/CharacterListView.vue'),
+      component: () => import('@/views/CloudLibraryView.vue'),
     },
     {
       path: '/blog',

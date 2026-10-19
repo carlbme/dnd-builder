@@ -1,27 +1,6 @@
-/**
- * La scheda personaggio come QR code.
- *
- * Non c'e' un server dietro a questo progetto, quindi il QR non puo' essere
- * un puntatore a qualcosa: deve portarsi dietro il personaggio per intero.
- * Da qui i due vincoli che decidono tutto il resto.
- *
- * Il primo e' la capienza. Un QR code arriva a 2.953 byte, e solo nella
- * versione piu' fitta e con la correzione d'errore piu' debole. Il link di
- * condivisione cosi' com'e' ne occupa da 4.300 a 6.400: non ci sta, e non e'
- * questione di margini. Compresso lo stesso personaggio scende a 1.550-2.150
- * e ci sta — con poco spazio davanti.
- *
- * Il secondo e' che quel poco spazio finisce. Un giocatore che scrive un
- * trascorso lungo sfonda il tetto. Invece di produrre un codice troncato, o
- * di rifiutarsi e basta, qui si lascia indietro il testo libero e si dice a
- * chi guarda che cosa e' rimasto fuori: una scheda senza il racconto si
- * rimette a posto in un minuto, un QR che non si legge no.
- *
- * Il disegno esce in SVG e non in PNG: si stampa nitido a qualunque misura,
- * pesa una frazione, e il progetto non usa immagini raster (WSG 3.5).
- */
+/** QR codes contain only authenticated server character links. */
 import type { CharacterData } from '@/stores/character'
-import { encodeCharacterCompressed, baseCondivisione, sappiamoComprimere } from './shareCharacter'
+import { generateShareUrl } from './shareCharacter'
 
 /** Correzione d'errore, dalla piu' robusta alla piu' capiente. */
 export type Correzione = 'M' | 'L'
@@ -97,41 +76,13 @@ async function prova(url: string, correzione: Correzione) {
   }
 }
 
-/**
- * Il QR della scheda.
- *
- * Si tenta nell'ordine: personaggio intero con correzione media, intero con
- * correzione bassa, e infine senza il testo libero. La correzione media si
- * prova per prima perche' un codice stampato o inquadrato di sbieco perdona
- * di piu'; si scende solo quando il personaggio non ci sta altrimenti.
- */
+/** Generate a QR only after the owner has confirmed a server save. */
 export async function creaQrScheda(char: CharacterData): Promise<QrScheda> {
-  if (!sappiamoComprimere()) {
-    throw new Error('QR_NO_COMPRESSION')
-  }
-  const base = baseCondivisione()
-
-  const tentativi: { omettiTesti: boolean; correzione: Correzione }[] = [
-    { omettiTesti: false, correzione: 'M' },
-    { omettiTesti: false, correzione: 'L' },
-    { omettiTesti: true, correzione: 'M' },
-    { omettiTesti: true, correzione: 'L' },
-  ]
-
-  for (const t of tentativi) {
-    const url = base + await encodeCharacterCompressed(char, t.omettiTesti)
-    const qr = await prova(url, t.correzione)
-    if (!qr) continue
-    const moduli = qr.getModuleCount()
-    return {
-      svg: disegnaSvg((r, c) => qr.isDark(r, c), moduli),
-      url,
-      byte: new TextEncoder().encode(url).length,
-      // La versione si ricava dal lato: lato = 17 + 4 x versione.
-      versione: (moduli - 17) / 4,
-      correzione: t.correzione,
-      ridotto: t.omettiTesti,
-    }
-  }
-  throw new Error('QR_TOO_LARGE')
+  const url = generateShareUrl(char)
+  const qr = await prova(url, 'M')
+  if (!qr) throw new Error('QR_TOO_LARGE')
+  const moduli = qr.getModuleCount()
+  return { svg: disegnaSvg((r, c) => qr.isDark(r, c), moduli), url,
+    byte: new TextEncoder().encode(url).length, versione: (moduli - 17) / 4,
+    correzione: 'M', ridotto: false }
 }

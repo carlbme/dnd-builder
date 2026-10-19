@@ -94,7 +94,7 @@ describe('precache del service worker', () => {
   // Controllo sull'esito reale, non sull'intenzione: il manifesto che il
   // service worker costruito porta davvero in giro.
   describe('manifesto generato in docs/sw.js', () => {
-    const swPath = path.join(root, 'docs', 'sw.js')
+    const swPath = path.join(root, 'dist', 'sw.js')
     const sw = fs.existsSync(swPath) ? fs.readFileSync(swPath, 'utf8') : ''
     const precache = catturaGruppo(sw, /url:"([^"]+)"/g)
 

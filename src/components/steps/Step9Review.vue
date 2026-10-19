@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useCloudStore } from '@/stores/cloud'
 import { useCharacterStore } from '@/stores/character'
 import { usePdfExport } from '@/composables/usePdfExport'
 import { copyShareUrl } from '@/utils/shareCharacter'
@@ -15,7 +16,6 @@ const { exportPdf, exporting } = usePdfExport()
 
 const char = computed(() => characterStore.character)
 
-const saveMessage = ref<{ type: 'success' | 'info'; text: string } | null>(null)
 
 
 
@@ -31,10 +31,9 @@ const saveMessage = ref<{ type: 'success' | 'info'; text: string } | null>(null)
 
 
 
-function saveChar() {
-  characterStore.saveCharacter()
-  saveMessage.value = { type: 'success', text: t('review.saveSuccess') }
-  setTimeout(() => { saveMessage.value = null }, 3000)
+async function saveChar() {
+  const cloud = useCloudStore()
+  await cloud.flush()
 }
 
 function downloadJson() {
@@ -143,18 +142,7 @@ function handleImport(event: Event) {
       <p class="text-stone-400 text-sm whitespace-pre-wrap">{{ char.sessionNotes }}</p>
     </div>
 
-    <!-- Save/Share confirmation banner -->
-    <Transition name="fade">
-      <div
-        v-if="saveMessage"
-        class="mt-4 p-3 rounded-lg border flex items-center gap-3 bg-green-900/30 border-green-700 text-green-300"
-        role="status"
-        aria-live="polite"
-      >
-        <span class="text-xl" aria-hidden="true">✅</span>
-        <p class="flex-1 text-sm">{{ saveMessage.text }}</p>
-      </div>
-    </Transition>
+    <!-- Sharing confirmation; save status is reported by AccountBar. -->
     <Transition name="fade">
       <div
         v-if="shareMessage"

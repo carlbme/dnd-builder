@@ -9,7 +9,7 @@ import { resolve } from 'path'
 const buildHash = execSync('git rev-parse --short HEAD').toString().trim()
 
 export default defineConfig({
-  base: '/dnd-character-builder/',
+  base: '/',
   define: {
     __BUILD_HASH__: JSON.stringify(buildHash),
   },
@@ -32,8 +32,8 @@ export default defineConfig({
         theme_color: '#292524',
         background_color: '#1c1917',
         display: 'standalone',
-        scope: '/dnd-character-builder/',
-        start_url: '/dnd-character-builder/',
+        scope: '/',
+        start_url: '/',
         icons: [
           {
             src: 'pwa-192x192.svg',
@@ -50,6 +50,7 @@ export default defineConfig({
         ],
       },
       workbox: {
+        navigateFallbackDenylist: [/^\/api(?:\/|$)/],
         // Le tre righe che fanno arrivare davvero la versione nuova.
         // skipWaiting: il service worker appena installato non aspetta che le
         // schede aperte si chiudano; clientsClaim: prende subito in carico le
@@ -98,6 +99,7 @@ export default defineConfig({
           'assets/game-dnd24-spells-it-*.js',
         ],
         runtimeCaching: [
+          { urlPattern: /\/api(?:\/|$)/, handler: 'NetworkOnly' },
           {
             urlPattern: /\.(?:pdf)$/,
             handler: 'CacheFirst',
@@ -126,8 +128,10 @@ export default defineConfig({
       '@': resolve(__dirname, './src'),
     },
   },
+  server: { proxy: { '/api': process.env.DND_DEV_BACKEND || 'http://127.0.0.1:8000' } },
+  preview: { proxy: { '/api': process.env.DND_DEV_BACKEND || 'http://127.0.0.1:8000' } },
   build: {
-    outDir: 'docs',
+    outDir: 'dist',
     rollupOptions: {
       output: {
         manualChunks: {
