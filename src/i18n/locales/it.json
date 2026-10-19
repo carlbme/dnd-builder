@@ -140,7 +140,10 @@
     "languageChoices": "linguaggi a scelta",
     "chooseSkills": "Scegli {count} abilità",
     "chooseMajorAbility": "Scegli la caratteristica che sale di 2",
-    "chooseMinorAbility": "Scegli la caratteristica che sale di 1"
+    "chooseMinorAbility": "Scegli la caratteristica che sale di 1",
+    "abilityScores": "Aumenti dei Punteggi di Caratteristica",
+    "abilityScoresHint": "Scegli due caratteristiche diverse tra quelle offerte da questo background: una aumenta di +2 e l’altra di +1.",
+    "originFeat": "Talento di Origine"
   },
   "equipment": {
     "title": "Equipaggiamento",

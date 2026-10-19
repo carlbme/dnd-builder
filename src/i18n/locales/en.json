@@ -140,7 +140,10 @@
     "languageChoices": "language(s) of your choice",
     "chooseSkills": "Choose {count} skill(s)",
     "chooseMajorAbility": "Choose the ability that gains +2",
-    "chooseMinorAbility": "Choose the ability that gains +1"
+    "chooseMinorAbility": "Choose the ability that gains +1",
+    "abilityScores": "Ability Score Increases",
+    "abilityScoresHint": "Choose two different abilities from this background's options: one gains +2 and the other gains +1.",
+    "originFeat": "Origin Feat"
   },
   "equipment": {
     "title": "Equipment",

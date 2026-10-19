@@ -392,7 +392,7 @@ function selectBackground(bg: Background) {
           <p class="text-stone-400">{{ originFeatLabel }}</p>
         </div>
         <div v-if="selectedBg.toolProficiencies.length">
-          <h4 class="font-semibold text-stone-300">Strumenti</h4>
+          <h4 class="font-semibold text-stone-300">{{ t('equipment.tools') }}</h4>
           <p class="text-stone-400">{{ selectedBg.toolProficiencies.join(', ') }}</p>
         </div>
         <div v-if="selectedBg.languages > 0">

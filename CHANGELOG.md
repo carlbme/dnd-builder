@@ -3,6 +3,15 @@
 Changes specific to the Blocker Bunch fork are recorded here. The original
 Brainstorm Club project's history remains in Git.
 
+## Background translation fix — 2026-10-19
+
+### Fixed
+
+- Restored English and Italian background ability-score headings, explanatory
+  +2/+1 hints, and origin-feat labels that previously displayed translation keys.
+- Made the background tools heading follow the selected interface language
+  instead of always displaying the Italian word “Strumenti”.
+
 ## Initial fork release — 2026-10-19
 
 ### Added

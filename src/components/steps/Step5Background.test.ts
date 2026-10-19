@@ -5,6 +5,8 @@ import { createI18n } from 'vue-i18n'
 import Step5Background from './Step5Background.vue'
 import { useCharacterStore } from '@/stores/character'
 import { getBackgrounds, preloadVariantData } from '@/data'
+import enMessages from '@/i18n/locales/en.json'
+import itMessages from '@/i18n/locales/it.json'
 
 const i18n = createI18n({
   legacy: false, locale: 'en', fallbackLocale: 'en',
@@ -284,5 +286,44 @@ describe('passo Background — bonus e talento d\'origine del 2024', () => {
     // E restano togliibili una volta sola: cambiando background spariscono
     await cards(wrapper)[bgs.findIndex(b => b.id === 'criminal')]!.trigger('click')
     expect(store.character.racialBonuses).toEqual({})
+  })
+})
+
+
+describe('background details use the selected language', () => {
+  beforeAll(async () => { await preloadVariantData('dnd2024') })
+  beforeEach(() => setActivePinia(createPinia()))
+
+  it.each([
+    { locale: 'en', ability: 'Ability Score Increases', feat: 'Origin Feat', tools: 'Tools' },
+    { locale: 'it', ability: 'Aumenti dei Punteggi di Caratteristica', feat: 'Talento di Origine', tools: 'Strumenti' },
+  ])('renders Criminal details in $locale without raw translation keys', async ({ locale, ability, feat, tools }) => {
+    const translations = createI18n({ legacy: false, locale, messages: { en: enMessages, it: itMessages } })
+    const store = useCharacterStore()
+    store.character.variant = 'dnd2024'
+    const wrapper = mount(Step5Background, { global: { plugins: [translations] } })
+    const index = getBackgrounds('dnd2024').findIndex(bg => bg.id === 'criminal')
+    await wrapper.findAll('[role="radiogroup"] button')[index]!.trigger('click')
+    const headings = wrapper.findAll('h4').map(h => h.text())
+    expect(headings).toContain(ability)
+    expect(headings).toContain(feat)
+    expect(headings).toContain(tools)
+    expect(wrapper.text()).not.toMatch(/background\.[A-Za-z]+/)
+    expect(wrapper.text()).toContain('+2')
+    expect(wrapper.text()).toContain('+1')
+    if (locale === 'en') {
+      expect(wrapper.text()).toContain('Choose two different abilities')
+      expect(headings).not.toContain('Strumenti')
+      expect(wrapper.text()).toContain('Alert')
+      const selects = wrapper.findAll('select')
+      await selects[0]!.setValue('dex')
+      await selects[1]!.setValue('con')
+      translations.global.locale.value = 'it'
+      await wrapper.vm.$nextTick()
+      expect(wrapper.findAll('h4').map(h => h.text())).toContain('Strumenti')
+      expect(store.character.background).toBe('criminal')
+      expect(store.character.racialBonuses).toEqual({ dex: 2, con: 1 })
+    }
+    wrapper.unmount()
   })
 })
