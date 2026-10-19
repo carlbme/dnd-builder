@@ -2,10 +2,10 @@
 import hashlib
 import json
 import os
-import re
 import secrets
 import sqlite3
 import time
+import threading
 import uuid
 from contextlib import asynccontextmanager
 from typing import Any
@@ -21,6 +21,13 @@ COOKIE = '__Host-dnd-session'
 SESSION_LIFE = 30 * 86400
 ph = PasswordHasher(time_cost=3, memory_cost=65536, parallelism=1, type=Type.ID)
 DUMMY_HASH = ph.hash(secrets.token_urlsafe(32))
+# Bound memory-heavy password work to 128 MiB in the 1 GiB container.
+password_slots = threading.BoundedSemaphore(2)
+
+
+def hash_password(password):
+    with password_slots:
+        return ph.hash(password)
 
 
 def digest(value):
@@ -143,7 +150,8 @@ class ShareWrite(BaseModel):
 
 def verify(password, hashed):
     try:
-        return ph.verify(hashed, password)
+        with password_slots:
+            return ph.verify(hashed, password)
     except (VerificationError, InvalidHashError):
         return False
 
@@ -168,7 +176,7 @@ def session(request: Request, response: Response):
 def register(body: Credentials, request: Request, response: Response, s=Depends(current)):
     throttle(request, 'register', body.username)
     user_id = str(uuid.uuid4())
-    hashed = ph.hash(body.password)
+    hashed = hash_password(body.password)
     try:
         with connect() as db:
             db.execute('INSERT INTO users VALUES (?,?,?,?)', (user_id, body.username, hashed, now()))
@@ -199,7 +207,7 @@ def change_password(body: PasswordChange, request: Request, response: Response, 
         hashed = db.execute('SELECT password_hash FROM users WHERE id=?', (s['user_id'],)).fetchone()[0]
     if not verify(body.current_password, hashed):
         raise HTTPException(403, 'Current password incorrect')
-    new_hash = ph.hash(body.password)
+    new_hash = hash_password(body.password)
     with connect() as db:
         db.execute('UPDATE users SET password_hash=? WHERE id=?', (new_hash, s['user_id']))
         db.execute('DELETE FROM sessions WHERE user_id=?', (s['user_id'],))
@@ -210,7 +218,7 @@ def change_password(body: PasswordChange, request: Request, response: Response, 
 @app.post('/api/reset-password')
 def reset_password(body: ResetPassword, request: Request, response: Response, s=Depends(current)):
     throttle(request, 'reset')
-    hashed = ph.hash(body.password)
+    hashed = hash_password(body.password)
     with connect() as db:
         db.execute('BEGIN IMMEDIATE')
         link = db.execute('SELECT * FROM reset_links WHERE token_hash=? AND expires_at>?', (digest(body.token), now())).fetchone()
