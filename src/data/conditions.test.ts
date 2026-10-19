@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest'
 import { dnd5eConditions } from './dnd5e/conditions'
 import { dnd2024Conditions } from './dnd2024/conditions'
 import { getConditions, getCondition, ensureConditionData, _resetCaches } from './index'
+import { dnd5eConditions as english2014, dnd2024Conditions as english2024 } from './conditions-en'
 import { GAME_VARIANTS } from '@/stores/app'
 
 /**
@@ -81,38 +82,27 @@ describe('dati delle condizioni', () => {
   })
 })
 
-describe('lettura per variante', () => {
+describe('English condition loading by variant', () => {
   beforeAll(async () => {
     _resetCaches()
-    for (const v of GAME_VARIANTS) await ensureConditionData(v)
+    for (const variant of GAME_VARIANTS) await ensureConditionData(variant)
   })
-
-  it('il 2024 legge le sue, le altre tre varianti quelle del 2014', () => {
-    expect(getConditions('dnd2024')).toEqual(dnd2024Conditions)
-    // Brancalonia e Apocalisse poggiano sulle regole 2014: prendono quelle,
-    // comprese le quattro senza testo.
-    for (const v of ['dnd5e', 'brancalonia', 'apocalisse'] as const) {
-      expect(getConditions(v), v).toEqual(dnd5eConditions)
-      expect(getConditions(v).filter(c => c.descriptionIt === null), v).toHaveLength(4)
+  it('uses the correct English rules edition for each variant', () => {
+    expect(getConditions('dnd2024')).toEqual(english2024)
+    for (const variant of ['dnd5e', 'brancalonia', 'apocalisse'] as const) {
+      expect(getConditions(variant)).toEqual(english2014)
+      expect(getConditions(variant).every(c => c.description && c.description.length > 40)).toBe(true)
     }
   })
-
-  it('la stessa condizione ha testi diversi nelle due edizioni', () => {
-    const a = getCondition('dnd5e', 'blinded')!
-    const b = getCondition('dnd2024', 'blinded')!
-    expect(a.descriptionIt).not.toBe(b.descriptionIt)
+  it('retains separate rules for matching condition IDs', () => {
+    expect(getCondition('dnd5e', 'exhaustion')!.description).not.toBe(getCondition('dnd2024', 'exhaustion')!.description)
   })
-
-  it('si cerca per id o per nome, in italiano o in inglese', () => {
-    expect(getCondition('dnd5e', 'prone')?.id).toBe('prone')
-    expect(getCondition('dnd5e', 'Prono')?.id).toBe('prone')
-    expect(getCondition('dnd5e', 'prone')?.nameIt).toBe('Prono')
-    expect(getCondition('dnd2024', 'spaventato')?.id).toBe('frightened')
+  it('looks up English names and IDs', () => {
+    expect(getCondition('dnd5e', 'prone')?.name).toBe('Prone')
     expect(getCondition('dnd2024', 'Frightened')?.id).toBe('frightened')
-    expect(getCondition('dnd5e', 'sbagliato')).toBeUndefined()
+    expect(getCondition('dnd5e', 'unknown')).toBeUndefined()
   })
-
-  it('prima del caricamento torna una lista vuota, non i dati dell\'altra edizione', () => {
+  it('returns empty lists until loaded', () => {
     _resetCaches()
     expect(getConditions('dnd5e')).toEqual([])
     expect(getConditions('dnd2024')).toEqual([])

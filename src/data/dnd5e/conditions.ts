@@ -14,6 +14,7 @@
 // Le usano anche Brancalonia e Apocalisse, che poggiano sulle regole 2014.
 
 export interface Condition {
+  description?: string
   id: string
   /** Nome originale (inglese) dell'SRD. */
   name: string

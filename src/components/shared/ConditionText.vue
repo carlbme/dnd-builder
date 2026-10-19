@@ -68,8 +68,8 @@ const idPannello = `cond-${Math.random().toString(36).slice(2, 9)}`
       {{ locale === 'it' ? condizioneAperta.nameIt : condizioneAperta.name }}
     </span>
 
-    <span v-if="condizioneAperta.descriptionIt" class="block mt-1">
-      {{ condizioneAperta.descriptionIt }}
+    <span v-if="condizioneAperta.description" class="block mt-1">
+      {{ condizioneAperta.description }}
     </span>
     <!-- Niente corsivo: quelle facce del carattere non sono precaricate per
          l'offline (`src/vite-config.test.ts`). L'assenza si segnala col colore. -->
@@ -88,11 +88,6 @@ const idPannello = `cond-${Math.random().toString(36).slice(2, 9)}`
 
     <span class="block mt-2 text-[0.65rem] text-stone-500">
       {{ t(variant === 'dnd2024' ? 'conditions.source2024' : 'conditions.source2014') }}
-      <!-- Il testo delle condizioni esiste solo nell'edizione italiana
-           dell'SRD: nell'interfaccia inglese va detto, non nascosto. -->
-      <template v-if="locale !== 'it' && condizioneAperta.descriptionIt">
-        {{ t('conditions.italianOnly') }}
-      </template>
     </span>
   </span>
 </template>

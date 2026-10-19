@@ -6,6 +6,17 @@ import BuilderView from './BuilderView.vue'
 import { useAppStore } from '@/stores/app'
 import { useCharacterStore } from '@/stores/character'
 
+// These tests exercise the shell; keep async step loaders out of its lifecycle.
+vi.mock('@/components/steps/Step1Variant.vue', () => ({ __esModule: true, default: { template: '<div />' } }))
+vi.mock('@/components/steps/Step2Race.vue', () => ({ __esModule: true, default: { template: '<div />' } }))
+vi.mock('@/components/steps/Step3Class.vue', () => ({ __esModule: true, default: { template: '<div />' } }))
+vi.mock('@/components/steps/Step4Abilities.vue', () => ({ __esModule: true, default: { template: '<div />' } }))
+vi.mock('@/components/steps/Step5Background.vue', () => ({ __esModule: true, default: { template: '<div />' } }))
+vi.mock('@/components/steps/Step6Equipment.vue', () => ({ __esModule: true, default: { template: '<div />' } }))
+vi.mock('@/components/steps/Step7Spells.vue', () => ({ __esModule: true, default: { template: '<div />' } }))
+vi.mock('@/components/steps/Step8Details.vue', () => ({ __esModule: true, default: { template: '<div />' } }))
+vi.mock('@/components/steps/Step9Review.vue', () => ({ __esModule: true, default: { template: '<div />' } }))
+
 vi.mock('vue-router', () => ({ useRouter: () => ({ push: vi.fn() }) }))
 
 const i18n = createI18n({

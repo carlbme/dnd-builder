@@ -6,8 +6,6 @@ import { useAppStore } from '@/stores/app'
 import { getRaces } from '@/data'
 import { testoTratto, type TestoSrd } from '@/data/srdText'
 import { getAvailableFeats } from '@/data/brancalonia/feats'
-import { getDnd2024FeatDescription } from '@/data/dnd2024/feats-it'
-import { translateGameTerm } from '@/i18n/gameTerms'
 import { getFeatsByCategory } from '@/data/dnd2024/feats'
 import type { Race } from '@/data/dnd5e/races'
 import type { AbilityScores } from '@/stores/character'
@@ -66,8 +64,8 @@ const availableFeats = computed(() => {
     return getFeatsByCategory('origin').map(f => ({
       id: f.id,
       name: f.name,
-      nameOriginal: translateGameTerm(f.name, 'it', 'feature'),
-      description: getDnd2024FeatDescription(f.id, locale.value, f.description),
+      nameOriginal: f.name,
+      description: f.description,
       benefits: [] as string[],
     }))
   }

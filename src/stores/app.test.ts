@@ -77,7 +77,7 @@ describe('useAppStore', () => {
     store.setLocale('en')
     expect(store.locale).toBe('en')
     store.setLocale('it')
-    expect(store.locale).toBe('it')
+    expect(store.locale).toBe('en')
   })
 
   /**
@@ -168,5 +168,19 @@ describe('useAppStore', () => {
     expect(store.theme).toBe('light')
     store.setTheme('auto')
     expect(store.theme).toBe('auto')
+  })
+})
+
+
+describe('English locale migration', () => {
+  it('ignores an old Italian preference without losing wizard progress or theme', () => {
+    const storage = memoryStorage()
+    storage.setItem('app', JSON.stringify({ locale: 'it', currentStep: 5, theme: 'dark', transcribing: true }))
+    reload(storage)
+    const store = useAppStore()
+    expect(store.locale).toBe('en')
+    expect(store.currentStep).toBe(5)
+    expect(store.theme).toBe('dark')
+    expect(store.transcribing).toBe(true)
   })
 })

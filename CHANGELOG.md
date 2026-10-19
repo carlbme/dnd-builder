@@ -3,6 +3,23 @@
 Changes specific to the Blocker Bunch fork are recorded here. The original
 Brainstorm Club project's history remains in Git.
 
+## English-only rework — 2026-10-19
+
+### Changed
+
+- English is the only interface language, including browsers and saved
+  preferences previously set to Italian. Removed the language selector.
+- All four variants export using the official English fillable character sheet.
+  Additional English pages retain long notes, extra weapons and spells, and
+  Brancalonia/Apocalisse details. Player-written content stays as entered.
+- Backgrounds, variant subclasses, feats, and brawling features use English
+  names and descriptions. Removed active Italian translation downloads.
+- Condition help now uses the matching English SRD edition, including all
+  fifteen conditions. Preserved separate 2014 and 2024 rules.
+- Translated Brancalonia sample character prose and moves, and presented
+  source credits in English while preserving the upstream license record.
+- Excluded legacy Italian PDF templates from deployed builds.
+
 ## Background translation fix — 2026-10-19
 
 ### Fixed

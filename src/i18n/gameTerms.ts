@@ -2218,6 +2218,7 @@ export function translateGameTerm(
     return proficiencyNamesEn[name] ?? titled
   }
   if (locale !== 'it') {
+    if (category === 'class' && name.toLowerCase() === 'burattinaio') return 'Puppeteer'
     // Trait ids are kebab-case, so they need presenting even in English.
     // featuresTraits mescola nomi di privilegi ('Spellcasting') e id di tratti
     // razziali ('darkvision'): anche qui l'id va presentato, non stampato.

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import LanguageSwitcher from './LanguageSwitcher.vue'
 import ThemeToggle from './ThemeToggle.vue'
 
 const { t } = useI18n()
@@ -65,7 +64,6 @@ function closeMobile() {
           class="text-stone-300 hover:text-amber-400 transition-colors text-sm"
         >{{ t('nav.blog') }}</router-link>
         <ThemeToggle />
-        <LanguageSwitcher />
       </nav>
     </div>
 
@@ -87,7 +85,6 @@ function closeMobile() {
       </router-link>
       <div class="flex items-center gap-3">
         <ThemeToggle />
-        <LanguageSwitcher />
       </div>
     </nav>
   </header>

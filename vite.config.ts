@@ -4,6 +4,7 @@ import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import { resolve } from 'path'
+import { rmSync, readFileSync } from 'node:fs'
 
 // Git hash for cache invalidation of localStorage game data
 const buildHash = execSync('git rev-parse --short HEAD').toString().trim()
@@ -14,6 +15,21 @@ export default defineConfig({
     __BUILD_HASH__: JSON.stringify(buildHash),
   },
   plugins: [
+    {
+      name: 'english-pdf-assets',
+      generateBundle() {
+        this.emitFile({
+          type: 'asset', fileName: 'licenses/Atkinson-OFL.txt',
+          source: readFileSync(resolve(__dirname, 'src/assets/fonts/Atkinson-OFL.txt'), 'utf8'),
+        })
+      },
+      // These are generated copies; historical upstream templates stay in Git.
+      closeBundle: { order: 'pre', handler() {
+        for (const name of ['dnd-5e-sheet', 'brancalonia-sheet', 'apocalisse-sheet']) {
+          rmSync(resolve(__dirname, `dist/pdf/${name}.pdf`), { force: true })
+        }
+      } },
+    },
     vue(),
     tailwindcss(),
     VitePWA({
@@ -26,6 +42,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'pwa-192x192.svg', 'pwa-512x512.svg'],
       manifest: {
+        lang: 'en',
         name: 'D&D Character Builder',
         short_name: 'DnD Builder',
         description: 'Create and manage your D&D 5e, Brancalonia, and Apocalisse characters',
@@ -67,7 +84,7 @@ export default defineConfig({
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
-        globPatterns: ['**/*.{js,css,html,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,svg,woff2,ttf}'],
         // WSG 3.3: il precache si scarica tutto al primo avvio, anche cio' che
         // nessuno chiedera' mai. Qui restano fuori i file che il browser non
         // richiede in nessun percorso dell'app:
@@ -82,21 +99,12 @@ export default defineConfig({
         //   nessuna regola CSS consuma (~6 KB).
         // Non e' una rimozione: se un giorno servissero, la rete li serve
         // comunque; qui evitiamo solo di pagarli in anticipo a ogni visitatore.
-        // - i due chunk del testo italiano degli incantesimi: 625 KB non
-        //   compressi che servono solo a chi gioca in italiano e solo nel
-        //   passo incantesimi. Nel precache li avrebbe pagati ogni visitatore,
-        //   inglese compreso, al primo avvio — l'esatto contrario del motivo
-        //   per cui il testo e' stato messo in un chunk a parte. Qui sotto
-        //   entrano in runtimeCaching: chi li apre li scarica una volta e poi
-        //   ce li ha anche offline.
         globIgnores: [
           '**/node_modules/**/*',
           '**/*-italic-*.woff2',
           'vite.svg',
           'og-image.svg',
           'assets/favicon-*.svg',
-          'assets/game-dnd5e-spells-it-*.js',
-          'assets/game-dnd24-spells-it-*.js',
         ],
         runtimeCaching: [
           { urlPattern: /\/api(?:\/|$)/, handler: 'NetworkOnly' },
@@ -106,17 +114,6 @@ export default defineConfig({
             options: {
               cacheName: 'pdf-templates',
               expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 7 },
-            },
-          },
-          {
-            // Il nome del file porta l'hash del build: una voce per edizione
-            // per build, e maxEntries tiene solo le ultime quattro invece di
-            // accumulare una copia per ogni versione mai visitata.
-            urlPattern: /\/assets\/game-dnd(?:5e|24)-spells-it-[^/]+\.js$/,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'spell-text-it',
-              expiration: { maxEntries: 4, maxAgeSeconds: 60 * 60 * 24 * 30 },
             },
           },
         ],
@@ -141,11 +138,6 @@ export default defineConfig({
           'game-dnd5e-classes': ['./src/data/dnd5e/classes.ts'],
           'game-dnd5e-backgrounds': ['./src/data/dnd5e/backgrounds.ts'],
           'game-dnd5e-spells': ['./src/data/dnd5e/spells.ts', './src/data/dnd5e/spells-4-9.ts'],
-          // Il testo italiano integrale sta in un chunk suo, uno per edizione:
-          // sono ~300 KB di prosa ciascuno e li scarica solo chi gioca in
-          // italiano, solo nel passo incantesimi, solo per la sua variante.
-          'game-dnd5e-spells-it': ['./src/data/dnd5e/spells-it.ts'],
-          'game-dnd24-spells-it': ['./src/data/dnd2024/spells-it.ts'],
           'game-dnd5e-equipment': ['./src/data/dnd5e/equipment.ts'],
           'game-dnd5e-rules': ['./src/data/dnd5e/rules.ts'],
           'game-branca-races': ['./src/data/brancalonia/races.ts'],

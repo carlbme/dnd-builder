@@ -56,27 +56,13 @@ describe('descrizioni italiane dei privilegi di D&D 2024', () => {
   })
 })
 
-describe('getFeatureDescription per la variante 2024', () => {
-  it('restituisce l\'italiano e non il fallback inglese', async () => {
-    await preloadVariantData('dnd2024')
-    for (const id of ['rage', 'weapon-mastery', 'monk-s-focus', 'cutting-words', 'overchannel']) {
-      const testo = getFeatureDescription('dnd2024', id, 'it', 'FALLBACK')
-      expect(testo).not.toBe('FALLBACK')
-      expect(testo).toBe(dnd2024FeatureDescriptionsIt[id])
-    }
-  })
-
-  it('lascia l\'inglese quando la lingua non è italiano', async () => {
-    await preloadVariantData('dnd2024')
-    expect(getFeatureDescription('dnd2024', 'rage', 'en', 'FALLBACK')).toBe('FALLBACK')
-  })
-
-  it('non pesca dalle descrizioni 2014 per gli id omonimi', async () => {
+describe('English-only class descriptions', () => {
+  it('returns the supplied English description even for a legacy Italian locale', async () => {
     await preloadVariantData('dnd2024')
     await preloadVariantData('dnd5e')
-    const testo = getFeatureDescription('dnd2024', 'primal-champion', 'it', 'FALLBACK')
-    expect(testo).toBe(dnd2024FeatureDescriptionsIt['primal-champion'])
-    // Nel 2024 il massimo è 25, nel 2014 era 24.
-    expect(testo).toContain('25')
+    for (const id of ['rage', 'primal-champion', 'weapon-mastery', 'monk-s-focus']) {
+      expect(getFeatureDescription('dnd2024', id, 'it', 'English rule text')).toBe('English rule text')
+      expect(getFeatureDescription('dnd2024', id, 'en', 'English rule text')).toBe('English rule text')
+    }
   })
 })

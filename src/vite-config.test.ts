@@ -40,8 +40,6 @@ describe('precache del service worker', () => {
     expect(patterns).toContain('vite.svg')
     expect(patterns).toContain('og-image.svg')
     expect(patterns).toContain('assets/favicon-*.svg')
-    expect(patterns).toContain('assets/game-dnd5e-spells-it-*.js')
-    expect(patterns).toContain('assets/game-dnd24-spells-it-*.js')
   })
 
   // Una versione nuova deve arrivare a chi ha gia' aperto l'app. Con
@@ -69,13 +67,11 @@ describe('precache del service worker', () => {
     expect(modulo).toMatch(/controllerchange/)
   })
 
-  // Il testo italiano degli incantesimi è l'unico caso di esclusione «serve,
-  // ma non a tutti»: 625 KB non compressi che riguardano solo chi gioca in
-  // italiano. Fuori dal precache, ma dentro runtimeCaching — senza la seconda
-  // metà l'esclusione sarebbe una regressione offline, non un risparmio.
-  it('il testo italiano degli incantesimi ha una regola di runtime caching', () => {
-    expect(viteConfig).toMatch(/cacheName:\s*'spell-text-it'/)
-    expect(viteConfig).toMatch(/game-dnd\(\?:5e\|24\)-spells-it/)
+  it('does not ship Italian spell chunks or obsolete PDF assets', () => {
+    const assets = fs.readdirSync(path.join(root, 'dist', 'assets'))
+    expect(assets.filter(name => name.includes('spells-it'))).toEqual([])
+    expect(fs.readdirSync(path.join(root, 'dist', 'pdf'))).toEqual(['character-sheet-en.pdf'])
+    expect(viteConfig).not.toMatch(/cacheName:\s*'spell-text-it'/)
   })
 
   // Le due facce corsive esistono ancora sul disco: l'esclusione ha senso solo

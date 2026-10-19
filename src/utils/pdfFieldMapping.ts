@@ -47,6 +47,7 @@ const siglaCaratteristica = (a: string) =>
  * background e a un allineamento già tradotti.
  */
 function pdfClassName(classId: string, variant: string, locale = 'it'): string {
+  if (locale !== 'it') return classId === 'burattinaio' ? 'Puppeteer' : capitalizeId(classId)
   if (variant === 'brancalonia') {
     return brancaloniaClassNamesIt[classId] ?? classNamesIt[capitalizeId(classId)] ?? capitalizeId(classId)
   }
@@ -203,9 +204,9 @@ function savingThrow(char: CharacterData, ability: keyof AbilityScores): number 
   return mod + prof
 }
 
-export function getDnd5eFieldMapping(char: CharacterData, uiLocale = 'en'): Record<string, string | boolean> {
+export function getDnd5eFieldMapping(char: CharacterData, uiLocale = 'en', englishOnly = false): Record<string, string | boolean> {
   const prof = proficiencyBonus(char.level)
-  const loc = sheetLocale(char.variant, uiLocale)
+  const loc = englishOnly ? 'en' : sheetLocale(char.variant, uiLocale)
   const fields: Record<string, string | boolean> = {}
 
   // Basic Info
@@ -332,7 +333,7 @@ export function getDnd5eFieldMapping(char: CharacterData, uiLocale = 'en'): Reco
     const feat = char.feat ? getDnd2024Feat(char.feat) : undefined
     // Il nome del talento va tradotto come tutto il resto della scheda:
     // qui usciva in inglese in mezzo a una riga italiana.
-    if (feat) featureLines.push(`Talento: ${translateGameTerm(feat.name, loc, 'feature')}`)
+    if (feat) featureLines.push(`${loc === 'it' ? 'Talento' : 'Feat'}: ${translateGameTerm(feat.name, loc, 'feature')}`)
     // Il background va tradotto come nel campo dedicato: qui finiva l'id
     // grezzo, e la scheda leggeva 'Background: acolyte'.
     if (bg) featureLines.push(`Background: ${translateGameTerm(bg, loc, 'background')}`)
@@ -340,36 +341,36 @@ export function getDnd5eFieldMapping(char: CharacterData, uiLocale = 'en'): Reco
   if (char.variant === 'brancalonia') {
     if (char.feat) {
       const featObj = getBrancaloniaFeatById(char.feat)
-      if (featObj) featureLines.push(`Talento: ${featObj.nameOriginal}`)
+      if (featObj) featureLines.push(`${loc === 'it' ? 'Talento' : 'Feat'}: ${loc === 'it' ? featObj.nameOriginal : featObj.name}`)
     }
     if (char.className) {
-      featureLines.push(`Rissa - Slot mossa: ${getMoveSlots(char.level)}, Mosse: ${getKnownMoveCount(char.level)}`)
+      featureLines.push(loc === 'it' ? `Rissa - Slot mossa: ${getMoveSlots(char.level)}, Mosse: ${getKnownMoveCount(char.level)}` : `Brawling - Move slots: ${getMoveSlots(char.level)}, Known moves: ${getKnownMoveCount(char.level)}`)
       const brawlFeat = getBrawlClassFeature(char.className)
-      if (brawlFeat) featureLines.push(`Mossa di Classe: ${brawlFeat.nameOriginal}`)
+      if (brawlFeat) featureLines.push(loc === 'it' ? `Mossa di Classe: ${brawlFeat.nameOriginal}` : `Class move: ${brawlFeat.name}`)
       const ace = char.level >= 6 ? getBrawlAce(char.className) : undefined
-      if (ace) featureLines.push(`Asso nella Manica: ${ace.nameOriginal}`)
+      if (ace) featureLines.push(loc === 'it' ? `Asso nella Manica: ${ace.nameOriginal}` : `Ace up the Sleeve: ${ace.name}`)
     }
   }
   if (char.variant === 'apocalisse') {
     if (char.mark) {
       const markObj = apocalisseRules.marks.find(m => m.id === char.mark)
       if (markObj) {
-        featureLines.push(`Marchio: ${markObj.nameOriginal}`)
+        featureLines.push(loc === 'it' ? `Marchio: ${markObj.nameOriginal}` : `Mark: ${markObj.name}`)
         if (char.markSpirit) {
           const spirit = markObj.spirits.find(s => s.id === char.markSpirit)
-          if (spirit) featureLines.push(`Spirito: ${spirit.nameOriginal}`)
+          if (spirit) featureLines.push(loc === 'it' ? `Spirito: ${spirit.nameOriginal}` : `Spirit: ${spirit.name}`)
         }
       }
     }
     if (char.virtue) {
       const virtueObj = apocalisseRules.virtues.find(v => v.id === char.virtue)
-      if (virtueObj) featureLines.push(`Virtù: ${virtueObj.nameOriginal}`)
+      if (virtueObj) featureLines.push(loc === 'it' ? `Virtù: ${virtueObj.nameOriginal}` : `Virtue: ${virtueObj.name}`)
     }
     if (char.sin) {
       const sinObj = apocalisseRules.sins.find(s => s.id === char.sin)
-      if (sinObj) featureLines.push(`Peccato: ${sinObj.nameOriginal}`)
+      if (sinObj) featureLines.push(loc === 'it' ? `Peccato: ${sinObj.nameOriginal}` : `Sin: ${sinObj.name}`)
     }
-    featureLines.push(`Umanità: ${char.humanity}`)
+    featureLines.push(`${loc === 'it' ? 'Umanità' : 'Humanity'}: ${char.humanity}`)
   }
   fields['Features and Traits'] = featureLines.join('\n')
   fields['PersonalityTraits '] = char.personalityTraits

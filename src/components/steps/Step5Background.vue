@@ -6,7 +6,6 @@ import { getBackgrounds } from '@/data'
 import type { Background } from '@/data/dnd5e/backgrounds'
 import { SKILLS } from '@/data/dnd5e/skills'
 import { getFeatsByCategory } from '@/data/dnd2024/feats'
-import { getDnd2024FeatDescription } from '@/data/dnd2024/feats-it'
 import { testoPrivilegioBackground, type TestoSrd } from '@/data/srdText'
 import { translateGameTerm } from '@/i18n/gameTerms'
 import type { AbilityKey } from '@/data/dnd5e/classes'
@@ -31,7 +30,6 @@ const gt = useGameTerms()
 
 /** Translate a background name. Uses nameOriginal for variant backgrounds, gameTerms for D&D 5e. */
 function bgDisplayName(bg: Background): string {
-  if ((bg as any).nameOriginal) return (bg as any).nameOriginal
   return gt.background(bg.name)
 }
 
@@ -97,7 +95,7 @@ const testoPrivilegioIt = computed<TestoSrd>(() => {
   const bg = selectedBg.value
   if (!bg?.feature) return { stato: 'assente' }
   const featId = originFeatId(bg, getFeatsByCategory('origin'))
-  const daTalento = featId ? getDnd2024FeatDescription(featId, 'it', '') : ''
+  const daTalento = getFeatsByCategory('origin').find(f => f.id === featId)?.description ?? ''
   return testoPrivilegioBackground(
     characterStore.character.variant,
     bg.feature.name,

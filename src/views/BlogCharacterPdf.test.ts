@@ -1,65 +1,25 @@
 import { describe, it, expect, beforeAll } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
 import { blogCharacters } from '@/data/blog/characters'
-import { getDnd5eFieldMapping, getBrancaloniaFieldMapping, getApocalisseFieldMapping } from '@/utils/pdfFieldMapping'
+import { englishPdfFields } from '@/utils/englishPdf'
 import { preloadVariantData } from '@/data'
 import { GAME_VARIANTS } from '@/stores/app'
-import messaggiIt from '@/i18n/locales/it.json'
-import type { CharacterData } from '@/stores/character'
-
-/**
- * I campi di prosa dei personaggi pronti stanno nei dati in inglese e hanno la
- * traduzione italiana nei file di lingua. La pagina la usa, il PDF no: usciva
- * una scheda italiana con tratti, ideali, legami e difetti in inglese.
- *
- * Qui si verifica la precondizione della correzione — che la traduzione ci sia
- * davvero e sia diversa dall'inglese — e che applicandola il PDF la porti.
- */
-const CAMPI = ['personalityTraits', 'ideals', 'bonds', 'flaws'] as const
-
-/** La stessa cosa che fa `charField` nella pagina. */
-function tradotto(slug: string, campo: string): string {
-  const dizionario = messaggiIt as unknown as {
-    blog?: { characters?: Record<string, Record<string, string> | undefined> }
-  }
-  return dizionario.blog?.characters?.[slug]?.[campo] ?? ''
-}
-
-function mappa(c: CharacterData) {
-  return c.variant === 'brancalonia' ? getBrancaloniaFieldMapping(c)
-    : c.variant === 'apocalisse' ? getApocalisseFieldMapping(c)
-      : getDnd5eFieldMapping(c, 'it')
-}
+import messages from '@/i18n/locales/en.json'
 
 beforeAll(async () => {
   setActivePinia(createPinia())
-  for (const v of GAME_VARIANTS) await preloadVariantData(v)
+  for (const variant of GAME_VARIANTS) await preloadVariantData(variant)
 })
 
-describe('la scheda PDF di un personaggio pronto esce in italiano', () => {
-  const conTraduzione = blogCharacters.filter(b => CAMPI.some(c => tradotto(b.slug, c)))
-
-  it('la maggior parte dei personaggi pronti ha la prosa tradotta', () => {
-    expect(conTraduzione.length, 'senza traduzioni la correzione non serve a niente')
-      .toBeGreaterThan(20)
+describe('English sample character exports', () => {
+  it.each(blogCharacters.filter(b => b.variant === 'brancalonia').map(b => [b.slug, b] as const))('%s uses the same English prose on screen and in exports', (slug, sample) => {
+    const entries = messages.blog.characters as unknown as Record<string, Record<string, string>>
+    for (const key of ['personalityTraits', 'ideals', 'bonds', 'flaws'] as const) {
+      expect(sample.characterData[key]).toBe(entries[slug]![key])
+      expect(Object.values(englishPdfFields(sample.characterData))).toContain(sample.characterData[key])
+    }
+    expect(sample.characterData.backstory).toBe(entries[slug]!.bio)
+    expect(sample.characterData.misdeeds).not.toMatch(/^Ha /)
+    expect(sample.characterData.brawlingMoves.join(', ')).not.toMatch(/Pugno|Schiaffo|Presa|Testata/)
   })
-
-  it.each(conTraduzione.slice(0, 20).map(b => [b.slug, b] as const))(
-    '%s: il testo italiano arriva sulla scheda',
-    (slug, bc) => {
-      // Quel che fa la pagina prima di esportare: traduce, poi mappa.
-      const copia: CharacterData = JSON.parse(JSON.stringify(bc.characterData))
-      for (const campo of CAMPI) {
-        const it = tradotto(slug, campo)
-        if (it) (copia as unknown as Record<string, string>)[campo] = it
-      }
-      const testo = Object.values(mappa(copia)).filter(v => typeof v === 'string').join(' ⁋ ')
-      for (const campo of CAMPI) {
-        const it = tradotto(slug, campo)
-        if (!it) continue
-        // Un pezzo riconoscibile basta: il PDF taglia i campi lunghi.
-        expect(testo, `${campo} non è arrivato tradotto`).toContain(it.slice(0, 24))
-      }
-    },
-  )
 })

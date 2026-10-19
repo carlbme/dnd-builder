@@ -47,7 +47,7 @@ export function furthestAllowedStep(c: StepProgress): number {
 }
 
 export const useAppStore = defineStore('app', () => {
-  const locale = ref<string>(navigator.language.startsWith('it') ? 'it' : 'en')
+  const locale = ref<string>('en')
   const currentStep = ref(0)
   const totalSteps = ref(STEP_KEYS.length)
   const theme = ref<ThemeMode>('auto')
@@ -58,8 +58,8 @@ export const useAppStore = defineStore('app', () => {
    */
   const transcribing = ref(false)
 
-  function setLocale(lang: string) {
-    locale.value = lang
+  function setLocale(_lang: string) {
+    locale.value = 'en'
   }
 
   function setTheme(mode: ThemeMode) {
@@ -113,6 +113,7 @@ export const useAppStore = defineStore('app', () => {
     // sta con lui: il personaggio in corso sopravvive al ricaricamento, e
     // ritrovarsi il tiro di dadi al posto dei campi da riempire a metà
     // trascrizione sarebbe la stessa perdita di contesto.
-    pick: ['locale', 'theme', 'currentStep', 'transcribing'],
+    afterHydrate: ({ store }) => { store.locale = 'en' },
+    pick: ['theme', 'currentStep', 'transcribing'],
   },
 })

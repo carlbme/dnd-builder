@@ -22,11 +22,13 @@ history, and attribution, and adds a FastAPI/SQLite account service.
   in **Shared with me**, and revoke future server access.
 - **Conflict protection:** revision checks preserve unsaved work when another
   device has saved a newer version; export the draft or reload the server copy.
-- **PDF and JSON:** retain upstream-compatible import/export and variant sheets.
+- **PDF and JSON:** upstream-compatible JSON import/export and English PDF sheets, with
+  additional pages for long notes, extra spells, and setting-specific details.
 - **Recovery drafts:** account-scoped browser drafts retain edits during a
   connection failure and retry after reconnecting.
-- **English and Italian:** translated builder and fork footer, with light and
-  dark themes and root-domain PWA assets.
+- **English only:** builder, rules explanations, built-in characters, and PDF
+  exports use English, with light and dark themes and root-domain PWA assets.
+  Existing player-written notes and names remain as entered.
 
 ## Using the application
 

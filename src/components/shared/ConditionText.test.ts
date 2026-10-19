@@ -3,89 +3,51 @@ import { mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
 import ConditionText from './ConditionText.vue'
 import { ensureConditionData } from '@/data'
-import messaggiIt from '@/i18n/locales/it.json'
-import messaggiEn from '@/i18n/locales/en.json'
+import messages from '@/i18n/locales/en.json'
 
-/**
- * Il testo di un privilegio con dentro il nome di una condizione: il nome si
- * apre, il testo dell'SRD compare, e dove l'SRD tace il pannello lo dichiara
- * invece di riempire il buco con l'altra edizione.
- */
-function monta(testo: string, variant: 'dnd5e' | 'dnd2024' | 'brancalonia', locale = 'it') {
-  const i18n = createI18n({ legacy: false, locale, messages: { it: messaggiIt, en: messaggiEn } })
-  return mount(ConditionText, {
-    props: { text: testo, variant },
-    global: { plugins: [i18n] },
-  })
+function mountText(text: string, variant: 'dnd5e' | 'dnd2024' | 'brancalonia' = 'dnd5e') {
+  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: messages } })
+  return mount(ConditionText, { props: { text, variant }, global: { plugins: [i18n] } })
 }
 
 beforeAll(async () => {
-  for (const v of ['dnd5e', 'dnd2024', 'brancalonia'] as const) await ensureConditionData(v)
+  for (const variant of ['dnd5e', 'dnd2024', 'brancalonia'] as const) await ensureConditionData(variant)
 })
 
-describe('ConditionText', () => {
-  it('stampa il testo intero, con la condizione come bottone', () => {
-    const w = monta('Il bersaglio è affascinato fino al tuo prossimo turno.', 'dnd5e')
-    expect(w.text()).toContain('Il bersaglio è affascinato fino al tuo prossimo turno.')
+describe('English condition explanations', () => {
+  it('keeps ordinary text intact and makes English conditions accessible buttons', () => {
+    const w = mountText('The target is Charmed until your next turn.')
+    expect(w.text()).toBe('The target is Charmed until your next turn.')
     expect(w.findAll('button')).toHaveLength(1)
-    expect(w.find('button').text()).toBe('affascinato')
+    expect(w.find('button').text()).toBe('Charmed')
+    expect(w.find('button').attributes('aria-expanded')).toBe('false')
   })
-
-  it('un testo senza condizioni non guadagna bottoni', () => {
-    const w = monta('Ottieni un dado di ispirazione.', 'dnd5e')
-    expect(w.findAll('button')).toHaveLength(0)
-    expect(w.text()).toContain('Ottieni un dado di ispirazione.')
+  it('does not add buttons to unrelated text', () => {
+    expect(mountText('You gain an inspiration die.').findAll('button')).toHaveLength(0)
   })
-
-  it('il bottone apre il testo dell\'SRD e lo richiude', async () => {
-    const w = monta('Il bersaglio è affascinato.', 'dnd5e')
-    expect(w.find('[role="note"]').exists()).toBe(false)
+  it('opens and closes English SRD text', async () => {
+    const w = mountText('The target is Charmed.')
     await w.find('button').trigger('click')
-    const nota = w.find('[role="note"]')
-    expect(nota.exists()).toBe(true)
-    expect(nota.text()).toContain('Una creatura affascinata non può attaccare chi l\'ha affascinata')
+    expect(w.find('[role="note"]').text()).toContain('A charmed creature can’t attack the charmer')
     expect(w.find('button').attributes('aria-expanded')).toBe('true')
     await w.find('button').trigger('click')
     expect(w.find('[role="note"]').exists()).toBe(false)
   })
-
-  it('dove l\'SRD 5.1 italiano tace lo dice, e non prende il testo del 2024', async () => {
-    const w = monta('Il bersaglio è spaventato.', 'dnd5e')
-    await w.find('button').trigger('click')
-    const nota = w.find('[role="note"]').text()
-    expect(nota).toContain('Spaventato')
-    expect(nota).toContain(messaggiIt.conditions.noText)
-    // Il testo del 2024 parla di «influenza sulle prove con d20»: se comparisse
-    // qui vorrebbe dire che l'edizione sbagliata è stata usata come tappabuchi.
-    expect(nota.toLowerCase()).not.toContain('prove con d20')
+  it.each(['dnd5e', 'dnd2024', 'brancalonia'] as const)('%s supplies English text for formerly untranslated conditions', async variant => {
+    for (const name of ['Frightened', 'Prone', 'Restrained', 'Stunned']) {
+      const w = mountText(`The target is ${name}.`, variant)
+      await w.find('button').trigger('click')
+      expect(w.find('[role="note"]').text()).not.toContain(messages.conditions.noText)
+      expect(w.find('[role="note"]').text()).not.toMatch(/creatura|personaggio|italian/i)
+    }
   })
-
-  it('la stessa condizione, nel 2024, ha il testo', async () => {
-    const w = monta('Il bersaglio è spaventato.', 'dnd2024')
-    await w.find('button').trigger('click')
-    expect(w.find('[role="note"]').text()).not.toContain(messaggiIt.conditions.noText)
-  })
-
-  it('Brancalonia legge le condizioni del 2014, non quelle del 2024', async () => {
-    const w = monta('Il bersaglio è spaventato.', 'brancalonia')
-    await w.find('button').trigger('click')
-    expect(w.find('[role="note"]').text()).toContain(messaggiIt.conditions.noText)
-  })
-
-  it('la nota redazionale sull\'«Incapacitato» del 2024 sta fuori dal testo della fonte', async () => {
-    const w = monta('Il bersaglio è incapacitato.', 'dnd2024')
-    await w.find('button').trigger('click')
-    const nota = w.find('[role="note"]')
-    expect(nota.text()).toContain('errore di traduzione')
-    // Separata a vista: sta in un blocco suo, staccato da un bordo.
-    const redazionale = nota.findAll('span').find(s => s.text().startsWith(messaggiIt.conditions.editorialNote))
-    expect(redazionale?.classes().join(' ')).toContain('border-t')
-  })
-
-  it('in inglese aggancia i nomi inglesi e avverte che il testo è italiano', async () => {
-    const w = monta('The target is Charmed.', 'dnd5e', 'en')
-    expect(w.find('button').text()).toBe('Charmed')
-    await w.find('button').trigger('click')
-    expect(w.find('[role="note"]').text()).toContain(messaggiEn.conditions.italianOnly)
+  it('preserves edition-specific exhaustion rules', async () => {
+    const old = mountText('You gain Exhaustion.', 'dnd5e')
+    const revised = mountText('You gain Exhaustion.', 'dnd2024')
+    await old.find('button').trigger('click')
+    await revised.find('button').trigger('click')
+    expect(old.find('[role="note"]').text()).toContain('Speed halved')
+    expect(revised.find('[role="note"]').text()).toContain('2 times your Exhaustion level')
+    expect(revised.find('[role="note"]').text()).not.toContain('Speed halved')
   })
 })

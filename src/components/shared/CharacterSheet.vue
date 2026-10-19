@@ -8,12 +8,10 @@ import { SKILLS } from '@/data/dnd5e/skills'
 import { getSpells, getApocalisseRules, getWhacksLevels } from '@/data'
 import { getBrancaloniaFeatById } from '@/data/brancalonia/feats'
 import { getDnd2024Feat } from '@/data/dnd2024/feats'
-import { getDnd2024FeatDescription } from '@/data/dnd2024/feats-it'
 import { translateGameTerm } from '@/i18n/gameTerms'
 import {
-  getMoveSlots, getKnownMoveCount, getBrawlClassFeature, getBrawlAce, brawlFeatureId,
+  getMoveSlots, getKnownMoveCount, getBrawlClassFeature, getBrawlAce,
 } from '@/data/brancalonia/brawl'
-import { brawlDescriptionsIt } from '@/data/brancalonia/brawl-it'
 import { useGameTerms } from '@/composables/useGameTerms'
 import ConditionText from '@/components/shared/ConditionText.vue'
 
@@ -143,19 +141,18 @@ const brawlKit = computed(() => {
   if (props.char.variant !== 'brancalonia' || !props.char.className) return null
   const cls = props.char.className
   const lv = props.char.level
-  const it = locale.value === 'it'
   const feature = getBrawlClassFeature(cls)
   const ace = lv >= 6 ? getBrawlAce(cls) : undefined
   return {
     slots: getMoveSlots(lv),
     moves: getKnownMoveCount(lv),
     feature: feature && {
-      name: it ? feature.nameOriginal : feature.name,
-      description: (it && brawlDescriptionsIt[brawlFeatureId(feature.name)]) || feature.description,
+      name: feature.name,
+      description: feature.description,
     },
     ace: ace && {
-      name: it ? ace.nameOriginal : ace.name,
-      description: (it && brawlDescriptionsIt[brawlFeatureId(ace.name)]) || ace.description,
+      name: ace.name,
+      description: ace.description,
     },
   }
 })
@@ -168,7 +165,7 @@ const displayFeat = computed(() => {
     // descrizione hanno la loro traduzione, va solo chiesta.
     return f ? {
       name: translateGameTerm(f.name, locale.value, 'feature'),
-      benefits: [getDnd2024FeatDescription(f.id, locale.value, f.description)],
+      benefits: [f.description],
     } : null
   }
   if (props.char.variant !== 'brancalonia') return null
