@@ -15,6 +15,8 @@ def connect(path=None):
     path = Path(path or database_path())
     path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
     db = sqlite3.connect(path, timeout=15)
+    # CLI migrations also run outside systemd; do not rely on its UMask.
+    os.chmod(path, 0o600)
     db.row_factory = sqlite3.Row
     db.execute('PRAGMA foreign_keys=ON')
     db.execute('PRAGMA busy_timeout=15000')

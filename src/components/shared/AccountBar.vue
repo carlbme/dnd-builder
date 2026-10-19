@@ -16,11 +16,11 @@ const cloud = useCloudStore()
   </aside>
 </template>
 <style>
-.account-bar { padding: .8rem 1rem; background: var(--bsc-carbone-800, #292524); border-bottom: 1px solid #78716c; font-size: .9rem; }
+.account-bar { padding: .8rem 1rem; background: var(--bsc-surface); color: var(--bsc-text); border-bottom: 1px solid #78716c; font-size: .9rem; }
 .account-bar a, .account-bar button { text-decoration: underline; }
 .cloud-panel { max-width: 64rem; margin: 1rem auto; }
 .cloud-panel label { display: block; margin: .8rem 0; }
-.cloud-panel input { display: block; padding: .6rem; background: #292524; color: #fafaf9; border: 1px solid #a8a29e; border-radius: .3rem; max-width: 100%; }
+.cloud-panel input { display: block; padding: .6rem; background: var(--bsc-surface-2); color: var(--bsc-text); border: 1px solid #a8a29e; border-radius: .3rem; max-width: 100%; }
 .cloud-panel button, .cloud-panel .action { display: inline-block; padding: .5rem .8rem; margin: .3rem; border: 1px solid #a8a29e; border-radius: .3rem; cursor: pointer; }
 .cloud-panel button:disabled { opacity: .5; cursor: wait; }
 .cloud-panel article { border: 1px solid #78716c; border-radius: .5rem; margin: 1rem 0; padding: 1rem; }

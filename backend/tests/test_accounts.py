@@ -119,6 +119,7 @@ def test_reset_expiry_one_use_and_session_invalidation(environment):
 def test_idempotent_create_backup_restore_and_restart(environment, tmp_path):
     with TestClient(app):
         alice, dm = register('alice'), register('dungeonmaster')
+        assert environment.stat().st_mode & 0o777 == 0o600
         a = create(alice)
         assert create(alice, a['client_id'])['id'] == a['id']
         path = '/api/characters/' + a['id']
